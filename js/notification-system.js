@@ -12,7 +12,7 @@ const NotificationSystem = {
     isOpen: false,
     notifications: [],
     refreshInterval: null,
-        //Wesley was here
+        
     /**
      * Initialize the notification system
      */
