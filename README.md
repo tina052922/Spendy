@@ -170,9 +170,11 @@ For enhanced functionality and automatic activity tracking:
 
 1. In phpMyAdmin, select the **"spendy_db"** database
 2. Go to the **"SQL"** tab
-3. Copy the **entire contents** of `spendy_views_and_triggers.sql`
+3. Copy the **entire contents** of `spendy_views_and_triggers_fixed.sql`
 4. Paste and click **"Go"**
 5. This will create database views and automatic activity tracking triggers
+
+**Note:** The fixed version corrects references to match the actual database schema. If you encounter errors with the original views file, use the `_fixed` version instead.
 
 ---
 
@@ -286,6 +288,8 @@ The database includes sample users for testing. However, **passwords are hashed*
 **Alternative: Sign in with Google**
 - Click the **"Sign in with Google"** button
 - Authorize the application with your Google account
+- After successful authentication, you'll be redirected to the **Dashboard (Expenses)** page
+- **Note:** Make sure Google OAuth credentials are configured in `includes/google_oauth.php`
 
 ---
 
@@ -510,9 +514,9 @@ Spendy/
 │   └── notification-system.js    # Notification handling
 │
 ├── index.html                    # Landing page (entry point)
-├── spendy_final_database.sql     # Database schema and sample data
-├── spendy_views_and_triggers.sql # Database views and triggers
-└── README.md                     # This file
+├── spendy_final_database.sql          # Database schema and sample data
+├── spendy_views_and_triggers_fixed.sql # Database views and triggers (fixed)
+└── README.md                          # This file
 ```
 
 ---
@@ -532,22 +536,28 @@ Spendy/
 
 ### Database Views (Optional)
 
-Install `spendy_views_and_triggers.sql` for:
-- User profile summaries
-- Financial summaries
+Install `spendy_views_and_triggers_fixed.sql` for:
+- User profile summaries (combines users with settings)
+- Financial summaries (aggregated income, expenses, savings)
 - Monthly income/expense aggregations
-- Savings plan details
-- Transaction history
+- Savings plan details with transaction counts
+- Transaction history with user information
 - Activity timelines
+- Category spending/income summaries
+- Active and ended savings plans views
+
+**Important:** The fixed version (`spendy_views_and_triggers_fixed.sql`) corrects column references to match the actual database schema. Use this version to avoid "invalid table/column" errors.
 
 ### Automatic Triggers
 
 The triggers file also creates automatic activity logging for:
 - User registrations
 - Profile updates
-- Income/expense changes
+- Income/expense changes (create, update, delete)
 - Savings plan modifications
-- Transaction logging
+- Transaction logging (deposits/withdrawals)
+- Settings updates
+- Password reset requests and completions
 
 ---
 
@@ -583,12 +593,15 @@ The triggers file also creates automatic activity logging for:
 
 #### Images Not Loading
 
-**Problem:** Images appear broken or missing
+**Problem:** Images appear broken or missing (e.g., hideicon.png, unhide.png)
 
 **Solutions:**
 1. Verify `images/` folder exists in project root
-2. Check image paths in HTML files use `../images/` (from views) or `images/` (from root)
+2. Check image paths in HTML files:
+   - From `views/` folder: Use `../images/` (e.g., `../images/hideicon.png`)
+   - From root folder: Use `images/` (e.g., `images/logo.png`)
 3. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)
+4. Check browser console (F12) for 404 errors and verify file paths
 
 #### API Calls Failing
 
@@ -600,6 +613,21 @@ The triggers file also creates automatic activity logging for:
 3. Check Network tab for failed API requests
 4. Verify API files are in `api/` folder
 5. Ensure database connection is working
+
+#### Google OAuth Issues
+
+**Problem:** "Error 400: redirect_uri_mismatch" when signing in with Google
+
+**Solutions:**
+1. The redirect URI is now dynamically generated based on your server configuration
+2. To get the correct redirect URI, access: `http://localhost/Spendy/api/debug_redirect_uri.php`
+3. Copy the displayed redirect URI
+4. Add it to your Google Cloud Console OAuth 2.0 credentials:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Navigate to APIs & Services > Credentials
+   - Edit your OAuth 2.0 Client ID
+   - Add the redirect URI to "Authorized redirect URIs"
+5. Ensure `includes/google_oauth.php` has your correct Client ID and Client Secret
 
 #### Session Issues
 
@@ -674,7 +702,16 @@ For issues or questions:
 ---
 
 **Last Updated:** December 2025  
-**Version:** 1.0
+**Version:** 1.1
+
+### Recent Updates (v1.1)
+
+- ✅ Fixed Google OAuth redirect URI mismatch (dynamic URI generation)
+- ✅ Updated Google sign-in redirect to Dashboard Expenses page
+- ✅ Fixed image path issues for password visibility icons
+- ✅ Corrected database views to match actual schema
+- ✅ Fixed stat sub-labels visibility in dashboard pages
+- ✅ Improved responsive design for login and signup pages
 
 ---
 
