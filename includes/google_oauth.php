@@ -2,14 +2,22 @@
 /**
  * Google OAuth Configuration
  * 
- * To get your Client ID and Client Secret:
+ * IMPORTANT: To fix "redirect_uri_mismatch" error:
  * 1. Go to https://console.cloud.google.com/
  * 2. Select your project: spendy-app-480000
  * 3. Go to APIs & Services > Credentials
- * 4. Create OAuth 2.0 Client ID (if not already created)
- * 5. Add authorized redirect URIs:
- *    - https://spendyapp.infinityfreeapp.com/api/google_callback.php
- *    - http://localhost/Spendy/api/google_callback.php (for local testing)
+ * 4. Click on your OAuth 2.0 Client ID
+ * 5. Under "Authorized redirect URIs", add the EXACT redirect URI that this script generates
+ * 
+ * To see what redirect URI is being used, visit: http://your-domain/Spendy/api/debug_redirect_uri.php
+ * 
+ * Common redirect URIs to add:
+ *    - http://localhost/Spendy/api/google_callback.php (for XAMPP local testing)
+ *    - http://localhost:80/Spendy/api/google_callback.php (if using port 80)
+ *    - http://127.0.0.1/Spendy/api/google_callback.php (alternative localhost)
+ *    - https://spendyapp.infinityfreeapp.com/api/google_callback.php (production)
+ * 
+ * NOTE: The redirect URI must match EXACTLY (including http vs https, port numbers, and path)
  */
 
 // Google OAuth Configuration
@@ -17,22 +25,33 @@
 define('GOOGLE_CLIENT_ID', '1070397679346-avnbto7vmiao1e3urtsiheqq3bpb0a25.apps.googleusercontent.com');
 define('GOOGLE_CLIENT_SECRET', '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');
 
-// Redirect URI - automatically detects environment
-// For production, use: https://spendyapp.infinityfreeapp.com/api/google_callback.php
-// For local testing, use: http://localhost/Spendy/api/google_callback.php
-if (isset($_SERVER['HTTP_HOST'])) {
-    $host = $_SERVER['HTTP_HOST'];
-    if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
-        // Local development
-        define('GOOGLE_REDIRECT_URI', 'http://localhost/Spendy/api/google_callback.php');
-    } else {
-        // Production (InfinityFree)
-        define('GOOGLE_REDIRECT_URI', 'https://spendyapp.infinityfreeapp.com/api/google_callback.php');
+// Redirect URI - automatically detects environment and builds from actual request
+// This ensures the redirect URI matches exactly what Google expects
+function getRedirectUri() {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    
+    // Build the base URL
+    $baseUrl = $protocol . '://' . $host;
+    
+    // Get the current script's directory to determine the project path
+    // When called from api/google_auth.php, SCRIPT_NAME will be /Spendy/api/google_auth.php
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    
+    // Extract the project directory (e.g., /Spendy)
+    $projectPath = '';
+    if (preg_match('#^/([^/]+)#', $scriptName, $matches)) {
+        $projectPath = '/' . $matches[1];
     }
-} else {
-    // Default to production if we can't detect
-    define('GOOGLE_REDIRECT_URI', 'https://spendyapp.infinityfreeapp.com/api/google_callback.php');
+    
+    // Build the redirect URI
+    $redirectPath = $projectPath . '/api/google_callback.php';
+    
+    return $baseUrl . $redirectPath;
 }
+
+// Define the redirect URI
+define('GOOGLE_REDIRECT_URI', getRedirectUri());
 
 // Google OAuth endpoints
 define('GOOGLE_AUTH_URL', 'https://accounts.google.com/o/oauth2/v2/auth');
