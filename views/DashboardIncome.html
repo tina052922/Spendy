@@ -438,33 +438,43 @@
             min-height: 160px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
         }
 
         .stat-label {
             font-size: 12px;
             color: var(--navy);
             margin-bottom: 4px;
+            position: relative;
+            z-index: 3;
         }
 
         .stat-value {
             font-size: 22px;
             font-weight: 600;
             color: var(--navy);
-            margin: 4px 0;
+            margin: 4px 0 8px 0;
             letter-spacing: -0.01em;
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 6px;
+            position: relative;
+            z-index: 3;
         }
 
         .stat-sub {
             font-size: 11px;
             color: var(--text-m);
             margin-bottom: 0;
+            margin-top: 0;
             position: relative;
-            z-index: 2;
+            z-index: 3;
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 1);
+            letter-spacing: 0.01em;
+            opacity: 0.85;
+            padding-bottom: 8px;
         }
 
         .stat-wave {

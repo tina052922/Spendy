@@ -8,11 +8,20 @@ session_start();
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/google_oauth.php';
 
+/**
+ * Helper function to get redirect path dynamically
+ */
+function getRedirectPath($relativePath) {
+    $scriptPath = $_SERVER['SCRIPT_NAME'];
+    $basePath = dirname(dirname($scriptPath));
+    return $basePath . $relativePath;
+}
+
 // Check if we have an authorization code
 if (!isset($_GET['code'])) {
     // Error occurred or user denied access
     $error = $_GET['error'] ?? 'Unknown error';
-    header('Location: ../login.html?error=' . urlencode('Google sign-in failed: ' . $error));
+    header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Google sign-in failed: ' . $error)));
     exit;
 }
 
@@ -40,7 +49,7 @@ curl_close($ch);
 
 if ($httpCode !== 200) {
     error_log("Google token exchange failed: " . $tokenResponse);
-    header('Location: ../login.html?error=' . urlencode('Failed to authenticate with Google'));
+    header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Failed to authenticate with Google')));
     exit;
 }
 
@@ -48,7 +57,7 @@ $tokenData = json_decode($tokenResponse, true);
 
 if (!isset($tokenData['access_token'])) {
     error_log("No access token in response: " . $tokenResponse);
-    header('Location: ../login.html?error=' . urlencode('Failed to get access token from Google'));
+    header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Failed to get access token from Google')));
     exit;
 }
 
@@ -65,7 +74,7 @@ curl_close($ch);
 
 if ($httpCode !== 200) {
     error_log("Google userinfo failed: " . $userInfoResponse);
-    header('Location: ../login.html?error=' . urlencode('Failed to get user information from Google'));
+    header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Failed to get user information from Google')));
     exit;
 }
 
@@ -73,7 +82,7 @@ $userInfo = json_decode($userInfoResponse, true);
 
 if (!isset($userInfo['id']) || !isset($userInfo['email'])) {
     error_log("Invalid user info: " . $userInfoResponse);
-    header('Location: ../login.html?error=' . urlencode('Invalid user information from Google'));
+    header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Invalid user information from Google')));
     exit;
 }
 
@@ -87,7 +96,7 @@ $profilePicture = $userInfo['picture'] ?? null;
 $stmt = mysqli_prepare($conn, "SELECT user_id, email, first_name, last_name, profile_photo FROM users WHERE google_id = ?");
 if (!$stmt) {
     error_log("Database prepare failed: " . mysqli_error($conn));
-    header('Location: ../login.html?error=' . urlencode('Database error occurred'));
+    header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Database error occurred')));
     exit;
 }
 
@@ -113,15 +122,15 @@ if ($user) {
         }
     }
     
-    // Redirect to dashboard/savings page
-    header('Location: ../savings.html');
+    // Redirect to dashboard expenses page
+    header('Location: ' . getRedirectPath('/views/DashboardExpenses.html'));
     exit;
 } else {
     // Check if user exists with this email (but no Google ID)
     $stmt = mysqli_prepare($conn, "SELECT user_id, email, first_name, last_name FROM users WHERE email = ?");
     if (!$stmt) {
         error_log("Database prepare failed: " . mysqli_error($conn));
-        header('Location: ../login.html?error=' . urlencode('Database error occurred'));
+        header('Location: ' . getRedirectPath('/views/login.html?error=' . urlencode('Database error occurred')));
         exit;
     }
     
@@ -145,7 +154,7 @@ if ($user) {
         $_SESSION['user_email'] = $existingUser['email'];
         $_SESSION['user_name'] = ($existingUser['first_name'] ?? '') . ' ' . ($existingUser['last_name'] ?? '');
         
-        header('Location: ../savings.html');
+        header('Location: ' . getRedirectPath('/views/DashboardExpenses.html'));
         exit;
     } else {
         // New user - create account
@@ -153,7 +162,7 @@ if ($user) {
         $stmt = mysqli_prepare($conn, "SELECT MAX(CAST(SUBSTRING(user_id, 5) AS UNSIGNED)) as max_num FROM users WHERE user_id LIKE 'user%'");
         if (!$stmt) {
             error_log("Database prepare failed: " . mysqli_error($conn));
-            header('Location: ../SignUp.html?error=' . urlencode('Database error occurred'));
+            header('Location: ' . getRedirectPath('/views/SignUp.html?error=' . urlencode('Database error occurred')));
             exit;
         }
         
@@ -168,7 +177,7 @@ if ($user) {
         $insertStmt = mysqli_prepare($conn, "INSERT INTO users (user_id, first_name, last_name, email, google_id, profile_photo, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
         if (!$insertStmt) {
             error_log("Database prepare failed: " . mysqli_error($conn));
-            header('Location: ../SignUp.html?error=' . urlencode('Database error occurred'));
+            header('Location: ' . getRedirectPath('/views/SignUp.html?error=' . urlencode('Database error occurred')));
             exit;
         }
         
@@ -189,13 +198,13 @@ if ($user) {
             $_SESSION['user_email'] = $email;
             $_SESSION['user_name'] = $firstName . ' ' . $lastName;
             
-            // Redirect to dashboard/savings page
-            header('Location: ../savings.html');
+            // Redirect to dashboard expenses page
+            header('Location: ' . getRedirectPath('/views/DashboardExpenses.html'));
             exit;
         } else {
             error_log("User insert failed: " . mysqli_error($conn));
             mysqli_stmt_close($insertStmt);
-            header('Location: ../SignUp.html?error=' . urlencode('Failed to create account'));
+            header('Location: ' . getRedirectPath('/views/SignUp.html?error=' . urlencode('Failed to create account')));
             exit;
         }
     }
