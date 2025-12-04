@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spendy – About Us</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+        body {
+  font-family: "Poppins", sans-serif;
+  color: #0a1a33;
+  background: #ffffff;
+  padding-bottom: 60px;
+  animation: fadeIn 0.15s ease-in;
+  overflow-x: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* HEADER */
+header {
+  width: 100%;
+  padding: 25px 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.header-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .left,
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+header img {
+  height: 50px;
+}
+
+header .left span,
+.header-left span {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.nav,
+nav {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.nav a,
+nav a {
+  color: #0A2A61;
+  font-size: 16px;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: 0.2s;
+  font-weight: 400;
+}
+
+.nav a:hover,
+nav a:hover {
+  opacity: 1;
+}
+
+.nav a.active,
+nav a.active {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.signup-btn {
+  background: #0A2A61;
+  padding: 10px 28px;
+  border-radius: 25px;
+  color: white !important;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 1 !important;
+  transition: background 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.signup-btn:hover {
+  background: #0d357a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 42, 97, 0.4);
+}
+
+/* MAIN CONTENT LAYOUT */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 70px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  min-height: calc(100vh - 100px);
+}
+
+/* LEFT SIDE - PHONES */
+.phones-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 600px;
+}
+
+.phones-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.phone-gradient {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 197, 253, 0.08) 50%, transparent 100%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.phone {
+  position: absolute;
+  width: 500px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+  z-index: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-10deg) perspective(1000px) rotateY(-3deg);
+}
+
+/* RIGHT SIDE - TEXT CONTENT */
+.text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 550px;
+}
+
+.story-label {
+  font-size: 13px;
+  color: #6b7280;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.main-heading {
+  font-size: 48px;
+  font-weight: 800;
+  color: #0A2A61;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.body-text {
+  font-size: 16px;
+  color: #0A2A61;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #0A2A61;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 20px;
+  transition: all 0.2s ease;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(10, 42, 97, 0.2);
+}
+
+.download-btn:hover {
+  background: #0d357a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(10, 42, 97, 0.3);
+}
+
+.download-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* Play Store Icon */
+.play-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 40px 50px;
+  }
+  
+  .phones-container {
+    order: -1;
+    min-height: 500px;
+  }
+  
+  .phone {
+    width: 400px;
+  }
+}
+
+@media (max-width: 800px) {
+  nav {
+    display: none;
+  }
+  header {
+    padding: 20px 25px;
+  }
+  .main-content {
+    padding: 40px 25px;
+    gap: 40px;
+  }
+  .main-heading {
+    font-size: 36px;
+  }
+  .phone {
+    width: 300px;
+  }
+        }
+    </style>
+
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <div class="left">
+      <img src="../images/logo.png" alt="Logo">
+      <span>SPENDY</span>
+    </div>
+
+    <nav class="nav">
+      <a href="../index.html">Home</a>
+      <a href="aboutus.html" class="active">About</a>
+      <a href="KeyFeatures.html">Features</a>
+      <a href="login.html">Sign In</a>
+      <a href="SignUp.html" class="signup-btn">Sign up</a>
+    </nav>
+  </div>
+</header>
+
+<div class="main-content">
+  <!-- LEFT SIDE - PHONES -->
+  <div class="phones-container">
+    <div class="phones-wrapper">
+      <div class="phone-gradient"></div>
+      <img src="../images/phone.png" alt="Spendy App" class="phone">
+    </div>
+                </div>
+
+  <!-- RIGHT SIDE - TEXT CONTENT -->
+  <div class="text-content">
+    <div class="story-label">OUR STORY</div>
+    <h1 class="main-heading">Empowering Your Financial Journey</h1>
+    <p class="body-text">
+      We believe financial freedom shouldn't be a struggle. Spendy-Budget Tracker is the modern, intuitive platform that helps the everyday spender win. Our mission is simple: provide clear insights and stress-free tools so you can master your money and build the future you want.
+                    </p>
+    <a href="#" class="download-btn">
+      <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M8 5v14l11-7z"/>
+                        </svg>
+      Download App
+                    </a>
+                </div>
+            </div>
+
+<script>
+  // Smooth page transitions
+  document.querySelectorAll('a[href$=".html"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && !href.startsWith('#') && !href.startsWith('http')) {
+        e.preventDefault();
+        document.body.style.transition = 'opacity 0.12s ease-out';
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+          window.location.href = href;
+        }, 120);
+      }
+    });
+  });
+</script>
+
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>
+

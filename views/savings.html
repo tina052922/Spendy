@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Plans</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #01143D;
+            --bg: #E8ECEF;
+            --card: #FFFFFF;
+            --text-dark: #1E2A39;
+            --text-muted: #A9AEB4;
+            --progress: #4AB3FF;
+            --progress-bg: #D7DDE4;
+            --danger: #E53535;
+            --success: #1DAA6F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 100px;
+            background: var(--navy);
+            margin: 20px 10px 20px 20px;
+            border-top-right-radius: 28px;
+            border-top-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            border-bottom-left-radius: 28px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .sidebar img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .sidebar .logo {
+            margin-top:-15px;
+            width: 95px;
+            height: 95px;
+        }
+
+        .nav-icon {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icon .hover-arch {
+            position: absolute;
+            width: 110px;
+            height: 120px;
+            margin-left: 33px;
+            object-fit: contain;
+        }
+
+        .nav-icon .active-icon {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main {
+            flex: 1;
+            padding: 24px 48px 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .top-icons {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .top-icons img {
+        width: 50px;
+        height: 50px;
+        border-radius: 24px;
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    /* Notification System */
+    .notification-wrapper {
+        position: relative;
+    }
+
+    .notification-icon-wrapper {
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .notification-icon-wrapper:hover {
+        transform: scale(1.05);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #E53535;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        border: 2px solid #FFFFFF;
+        z-index: 10;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.2s;
+    }
+
+    .notification-badge.show {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 380px;
+        max-height: 500px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+        pointer-events: none;
+        transition: all 0.2s;
+        overflow: hidden;
+    }
+
+    .notification-dropdown.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: all;
+    }
+
+    .notification-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1E2A39;
+    }
+
+    .notification-header button {
+        background: none;
+        border: none;
+        color: #A9AEB4;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .notification-header button:hover {
+        background: #E8ECEF;
+        color: #1E2A39;
+    }
+
+    .notification-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        gap: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .notification-item:hover {
+        background: #E8ECEF;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-icon-large {
+        font-size: 24px;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #E8ECEF;
+        border-radius: 10px;
+    }
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-message {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1E2A39;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .notification-time {
+        font-size: 12px;
+        color: #A9AEB4;
+    }
+
+    .notification-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #A9AEB4;
+        font-size: 14px;
+    }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 440px;
+            gap: 16px;
+            height: calc(100vh - 120px);
+        }
+
+        .left-content {
+            margin-left: -40px; 
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+            overflow: hidden;
+        }
+
+        .section {
+            margin: 0;
+            width: 100%;
+            max-height: 340px;
+            gap: 2px;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-height: 0;
+        }
+
+        .section-header {
+            background: var(--navy);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-size: 20px;
+            font-weight: 600;
+            width: 100%;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .plans-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-right: -8px;
+            min-height: 0;
+            padding-top: 8px;
+            
+        }
+
+        .plans-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .plans-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .plans-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 999px;
+        }
+
+        .plan-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            gap: 28px;
+            box-shadow: 0 12px 24px rgba(8, 26, 81, 0.08);
+            min-height: 150px;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .plan-info {
+            flex: 1;
+        }
+
+        .plan-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .plan-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .plan-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .progress-wrapper {
+            margin: 14px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--progress-bg);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--progress);
+            border-radius: inherit;
+        }
+
+        .plan-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+
+        .plan-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .edit-link {
+            color: var(--navy);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .draw-btn-wrapper {
+            position: relative;
+            width: 160px;
+            margin-top: auto;
+        }
+
+        .draw-btn {
+            width: 160px;
+            height: 55px;
+            border: none;
+            background: var(--navy);
+            border-radius: 16px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            z-index: 1;
+        }
+
+        .right-panel {
+            background: #1B2B42;
+            border-radius: 30px;
+            padding: 22px 26px 28px;
+            color: #fff;
+            height: 100%;
+            box-shadow: 0 12px 32px rgba(8, 26, 81, 0.15);
+            margin-left: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .right-panel h2 {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .input {
+            width: 100%;
+            border: none;
+            border-radius: 18px;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 15px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .input:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Custom dropdown arrow for select elements */
+        select.input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='rgba(255,255,255,0.8)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        select.input option {
+            background: #1B2B42;
+            color: #fff;
+            padding: 12px;
+        }
+
+        select.input option:checked {
+            background: #4AB3FF;
+        }
+
+        .amount-field {
+            position: relative;
+        }
+
+        .amount-field span {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+        }
+
+        .date-switch {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .date-switch button {
+            flex: 1;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            min-width: 100px;
+        }
+
+        .date-switch button.active {
+            background: #4AB3FF;
+        }
+
+        .calendar {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .calendar-days-header {
+            display: grid;
+            grid-template-columns: repeat(7, 36px);
+            justify-content: center;
+            gap: 7px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 36px);
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .calendar-day {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.8);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .calendar-day.muted {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .calendar-day.active {
+            background: #4AB3FF;
+            color: #fff;
+        }
+
+        .duration-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 18px;
+            padding: 10px 16px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-row input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .save-btn {
+            width: 100%;
+            border: none;
+            border-radius: 32px;
+            padding: 14px;
+            background: #4AB3FF;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: auto;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 1200px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="app-wrapper"></div>
+        <aside class="sidebar">
+            <a href="DashboardExpenses.html" style="text-decoration: none;">
+            <img src="../images/spendylogo.png" alt="Spendy logo" class="logo">
+            </a>
+            <div class="nav-icon" onclick="window.location.href='DashboardExpenses.html'" style="cursor: pointer;">
+                <img src="../images/dashboardicon.png" alt="Dashboard">
+            </div>
+            <div class="nav-icon">
+                <img src="../images/archsavingshover.png" alt="Active" class="hover-arch">
+                <img src="../images/savingsicon.png" alt="Savings" class="active-icon">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+                <img src="../images/Windows 10 Settings - iconSvg.co.png" alt="Settings">
+            </div>
+            <div class="nav-icon" style="margin-top:auto; cursor: pointer;" onclick="handleLogout()">
+                <img src="../images/logouticon.png" alt="Logout">
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="page-header">
+                <h1 class="page-title">Savings Plans</h1>
+                <div class="top-icons">
+                    <div class="notification-wrapper">
+                        <div class="notification-icon-wrapper" onclick="toggleNotifications()">
+                            <img src="../images/notificon.png" alt="Notifications" id="notificationIcon">
+                            <span class="notification-badge" id="notificationBadge"></span>
+                        </div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button onclick="loadNotifications()">Refresh</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon" onclick="window.location.href='profile.html'" style="cursor: pointer;">
+                </div>
+            </header>
+
+            <section class="layout">
+                <div>
+                    <div class="section">
+                        <div class="section-header">Active Plans</div>
+                        <div id="activePlans" class="plans-scroll"></div>
+                    </div>
+
+                    <div class="section" style="margin-top: 20px;">
+                        <div class="section-header">Ended Plans</div>
+                        <div id="endedPlans" class="plans-scroll"></div>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <h2>Add Savings Plan</h2>
+                    <form id="addPlanForm">
+                        <div class="field" style="margin-top:10px;">
+                            <input id="planName" name="planName" class="input" type="text" placeholder="Plan name" maxlength="100" required>
+                        </div>
+                        <div class="field amount-field">
+                            <input id="goalAmount" name="goalAmount" class="input" type="number" min="0.01" step="0.01" placeholder="Amount" required>
+                            <span>₱</span>
+                        </div>
+                        <div class="field">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <label style="margin-bottom: 0;">Select Date</label>
+                                <div class="date-switch" style="width: auto; margin-bottom: 0;">
+                                    <button type="button" class="active" id="startDateToggle">Start Date</button>
+                                    <button type="button" id="endDateToggle">End Date</button>
+                                </div>
+                            </div>
+                            <div class="calendar">
+                                <div class="calendar-days-header">
+                                    <div>Sun</div>
+                                    <div>Mon</div>
+                                    <div>Tue</div>
+                                    <div>Wed</div>
+                                    <div>Thu</div>
+                                    <div>Fri</div>
+                                    <div>Sat</div>
+                                </div>
+                                <div class="calendar-grid" id="calendarDays"></div>
+                            </div>
+                            <input type="hidden" id="startDate" name="startDate" required>
+                            <input type="hidden" id="endDate" name="endDate" required>
+                        </div>
+                        <div class="duration-box">
+                            <label style="color:rgba(255,255,255,0.7);font-size:12px;">Duration</label>
+                            <div id="durationValue">14 Days</div>
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="isLocked" name="isLocked">
+                            <label for="isLocked">No Withdrawal</label>
+                        </div>
+                        <button class="save-btn" type="submit">Save Plan</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const calendarDaysEl = document.getElementById('calendarDays');
+        const startToggle = document.getElementById('startDateToggle');
+        const endToggle = document.getElementById('endDateToggle');
+        const addPlanForm = document.getElementById('addPlanForm');
+        const planNameInput = document.getElementById('planName');
+        const goalAmountInput = document.getElementById('goalAmount');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const isLockedCheckbox = document.getElementById('isLocked');
+        let selectingStart = true;
+        let selectedStart = null;
+        let selectedEnd = null;
+        let currentCalendarDate = new Date(); // Track current calendar month/year
+
+        function buildCalendar(date = null) {
+            // Use provided date, or current calendar date, or current date
+            const displayDate = date || currentCalendarDate || new Date();
+            currentCalendarDate = new Date(displayDate); // Update tracked date
+            
+            const year = displayDate.getFullYear();
+            const month = displayDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevDays = new Date(year, month, 0).getDate();
+
+            const cells = [];
+            for (let i = firstDay - 1; i >= 0; i--) {
+                cells.push({ label: prevDays - i, muted: true });
+            }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const value = `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                cells.push({ label: d, value });
+            }
+            while (cells.length % 7 !== 0) {
+                cells.push({ label: cells.length % 7 + 1, muted: true });
+            }
+
+            calendarDaysEl.innerHTML = cells.map(cell => {
+                const active = (!cell.muted && ((selectingStart && cell.value === selectedStart) || (!selectingStart && cell.value === selectedEnd))) ? 'active' : '';
+                return `<div class="calendar-day ${cell.muted ? 'muted' : ''} ${active}" data-value="${cell.value || ''}">${cell.label}</div>`;
+            }).join('');
+        }
+
+        calendarDaysEl.addEventListener('click', (e) => {
+            const target = e.target.closest('.calendar-day');
+            if (!target || !target.dataset.value) return;
+            const value = target.dataset.value;
+            if (selectingStart) {
+                selectedStart = value;
+                startDateInput.value = value;
+                // Update calendar to show the selected date's month
+                const selectedDate = new Date(value);
+                currentCalendarDate = selectedDate;
+            } else {
+                selectedEnd = value;
+                endDateInput.value = value;
+                // Update calendar to show the selected date's month
+                const selectedDate = new Date(value);
+                currentCalendarDate = selectedDate;
+            }
+            updateDurationText();
+            buildCalendar(currentCalendarDate);
+        });
+
+        startToggle.addEventListener('click', () => {
+            selectingStart = true;
+            startToggle.classList.add('active');
+            endToggle.classList.remove('active');
+            // If start date is selected, show that month; otherwise show current month
+            const dateToShow = selectedStart ? new Date(selectedStart) : (currentCalendarDate || new Date());
+            buildCalendar(dateToShow);
+        });
+
+        endToggle.addEventListener('click', () => {
+            selectingStart = false;
+            endToggle.classList.add('active');
+            startToggle.classList.remove('active');
+            // If end date is selected, show that month; otherwise show current month
+            const dateToShow = selectedEnd ? new Date(selectedEnd) : (currentCalendarDate || new Date());
+            buildCalendar(dateToShow);
+        });
+
+        function updateDurationText() {
+            const durationEl = document.getElementById('durationValue');
+            if (!selectedStart || !selectedEnd) {
+                durationEl.textContent = '0 Days';
+                return;
+            }
+            const start = new Date(selectedStart);
+            const end = new Date(selectedEnd);
+            const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            durationEl.textContent = diff > 0 ? `${diff} Days` : '0 Days';
+        }
+
+        buildCalendar();
+
+        // Load plans from database via PHP
+        let savingsPlans = [];
+        
+        async function loadPlans() {
+            try {
+                // Get user_id from profile or use default
+                // TODO: Replace with actual user_id from session
+                let userId = 'user002'; // Default to match profile
+                try {
+                    const profileResponse = await fetch('../api/get_profile.php');
+                    if (profileResponse.ok) {
+                        const profileData = await profileResponse.json();
+                        if (profileData && profileData.userId) {
+                            userId = profileData.userId;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not get user ID from profile, using default');
+                }
+                
+                const response = await fetch(`../api/get_savings.php?user_id=${userId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    savingsPlans = data.plans;
+                    renderPlans();
+                } else {
+                    console.error('Error loading plans:', data.error);
+                    alert('Failed to load savings plans: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Failed to load plans:', error);
+                alert('Failed to load savings plans. Please check your connection.');
+            }
+        }
+        
+        // Load plans on page load
+        loadPlans();
+
+        function isPlanLocked(plan) {
+            const value = plan?.is_locked;
+            return value === true || value === 1 || value === '1';
+        }
+
+        function renderPlanCard(plan) {
+            const savedAmount = Number(plan.saved_amount ?? 0);
+            const goalAmount = Number(plan.goal_amount ?? 0);
+            const progress = goalAmount > 0 ? Math.round((savedAmount / goalAmount) * 100) : 0;
+            const statusValue = String(plan.status || '').toLowerCase();
+            const isActive = statusValue === 'active';
+            const planName = plan.plan_name || 'Unnamed Plan';
+            const targetDate = plan.end_date || 'No target date';
+            const actionLabel = isPlanLocked(plan) ? 'Save Money' : 'Draw/Save Money';
+            const statusColor = statusValue === 'finished' ? 'var(--success)' : 'var(--danger)';
+            return `
+                <div class="plan-card">
+                    <div class="plan-info">
+                        <div class="plan-name">${planName}</div>
+                        <div class="plan-amount">₱${savedAmount.toLocaleString('en-PH')} / ₱${goalAmount.toLocaleString('en-PH')}</div>
+                        <div class="progress-wrapper">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width:${Math.min(progress,100)}%"></div>
+                            </div>
+                            <div class="plan-meta">
+                                <span>${progress}% complete</span>
+                                <span>Target Date: ${targetDate}</span>
+                            </div>
+                        </div>
+                        ${!isActive ? `<div class="status-pill" style="color:${statusColor};">
+                            ${statusValue === 'finished' ? 'Finished ✔' : 'Unfinished ✖'}
+                        </div>` : ''}
+                    </div>
+                    <div class="plan-actions">
+                        ${isActive ? `<span class="edit-link" onclick="editPlan('${plan.savings_id}')">Edit</span>` : ''}
+                        <div class="draw-btn-wrapper">
+                            <button class="draw-btn" onclick="openDrawSavePage('${plan.savings_id}')">${actionLabel}</button>
+                            <div class="draw-arch"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlans() {
+            const activeContainer = document.getElementById('activePlans');
+            const endedContainer = document.getElementById('endedPlans');
+            activeContainer.innerHTML = savingsPlans
+                .filter(p => String(p.status || '').toLowerCase() === 'active')
+                .map(renderPlanCard)
+                .join('');
+            endedContainer.innerHTML = savingsPlans
+                .filter(p => String(p.status || '').toLowerCase() !== 'active')
+                .map(renderPlanCard)
+                .join('');
+        }
+
+        addPlanForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(addPlanForm);
+            formData.set('planName', planNameInput.value.trim());
+            formData.set('goalAmount', goalAmountInput.value);
+            formData.set('startDate', startDateInput.value);
+            formData.set('endDate', endDateInput.value);
+            formData.set('isLocked', isLockedCheckbox.checked ? '1' : '0');
+            // Get user_id from profile or use default
+            let userId = 'user002'; // Default to match profile
+            try {
+                const profileResponse = await fetch('../api/get_profile.php');
+                if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    if (profileData && profileData.userId) {
+                        userId = profileData.userId;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not get user ID from profile, using default');
+            }
+            formData.set('user_id', userId); // TODO: Get from session
+            
+            try {
+                const response = await fetch('../api/add_savings.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Plan created successfully! Savings ID: ' + data.savings_id);
+                    // Reload plans from database
+                    await loadPlans();
+                    // Reset form
+                    e.target.reset();
+                    selectedStart = selectedEnd = null;
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                    updateDurationText();
+                    buildCalendar();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Failed to create plan: ' + error.message);
+            }
+        });
+
+        function editPlan(savingsId) {
+            window.location.href = `edit-savings.html?savingsId=${encodeURIComponent(savingsId)}`;
+        }
+
+        function openDrawSavePage(savingsId) {
+            window.location.href = `drawsavemoney.html?savingsId=${encodeURIComponent(savingsId)}`;
+        }
+
+// Load profile image for header
+async function loadHeaderProfileImage() {
+    const headerProfileIcon = document.getElementById('headerProfileIcon');
+    
+    if (!headerProfileIcon) {
+        console.error('Header profile icon element not found');
+        return;
+    }
+    
+    // Set default image first
+    const defaultImage = '../images/blankprofile.png';
+    headerProfileIcon.src = defaultImage;
+    
+    try {
+        const response = await fetch('../api/get_profile.php', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            
+            // Check if user has uploaded a profile image
+            // Base64 data URIs start with "data:image/" and can be very long
+            if (userData && userData.profileImage && 
+                userData.profileImage.trim() !== '' && 
+                userData.profileImage !== 'null' &&
+                userData.profileImage.length > 0) {
+                // User has uploaded a profile image (base64 data URI or file path)
+                try {
+                headerProfileIcon.src = userData.profileImage;
+                    // Verify image loaded successfully
+                    headerProfileIcon.onerror = function() {
+                        console.warn('Failed to load profile image, using default');
+                        headerProfileIcon.src = defaultImage;
+                    };
+                } catch (imgError) {
+                    console.error('Error setting profile image:', imgError);
+                    headerProfileIcon.src = defaultImage;
+                }
+            } else {
+                // No profile image, use default
+                headerProfileIcon.src = defaultImage;
+            }
+        } else {
+            // API call failed, use default
+            console.warn('API call failed, using default image');
+            headerProfileIcon.src = defaultImage;
+        }
+    } catch (error) {
+        console.error('Error loading profile image:', error);
+        // On error, ensure default image is shown
+        headerProfileIcon.src = defaultImage;
+    }
+}
+
+// Load profile image on page load
+loadHeaderProfileImage();
+
+// Logout function
+function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        fetch('../api/logout.php', { method: 'POST' })
+            .then(() => window.location.href = 'login.html')
+            .catch(() => window.location.href = 'login.html');
+    }
+    }
+    </script>
+    <script src="../js/notification-system.js"></script>
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>

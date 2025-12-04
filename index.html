@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spendy – Budget Tracker</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: white;
+  overflow-x: hidden;
+  animation: fadeIn 0.15s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* HEADER */
+header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 25px 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.header-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .left {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+header img {
+  height: 50px;
+}
+
+.nav {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 0.85;
+  transition: 0.2s;
+}
+
+.nav a:hover {
+  opacity: 1;
+}
+
+.signup-btn {
+  background: #0A2A61;
+  padding: 10px 28px;
+  border-radius: 25px;
+  font-size: 16px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.signup-btn:hover {
+  background: #0d357a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(10, 42, 97, 0.4);
+}
+
+/* HERO SECTION */
+.hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+}
+
+.hero img.bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* LEFT BLUE GRADIENT */
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 55%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: linear-gradient(to right, rgba(7, 40, 112, 0.92), rgba(0, 0, 0, 0));
+  z-index: 2;
+}
+
+/* HERO CONTENT */
+.hero .content-wrapper {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 70px;
+}
+
+.hero .content {
+  max-width: 550px;
+  margin-left: 0;
+}
+
+.hero .title {
+  font-size: 48px;
+  line-height: 1.2;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.hero .subtitle {
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 35px;
+}
+
+/* CTA BUTTON */
+.cta-btn {
+  background: white;
+  color: #153A88;
+  padding: 15px 35px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 30px;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.15s;
+}
+
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+  header {
+    padding: 20px 25px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .hero::before {
+    width: 100%;
+  }
+
+  .hero .content-wrapper {
+    padding: 0 25px;
+  }
+  
+  .hero .content {
+    max-width: 90%;
+  }
+
+  .hero .title {
+    font-size: 36px;
+  }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="header-container">
+    <div class="left">
+      <img src="images/logo(white).png" alt="SPENDY">
+      <span style="font-weight:600; font-size:20px;">SPENDY</span>
+    </div>
+
+    <nav class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="views/aboutus.html">About</a>
+      <a href="views/KeyFeatures.html">Features</a>
+      <a href="views/login.html">Sign In</a>
+      <a href="views/SignUp.html" class="signup-btn">Sign up</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <img src="images/bg.jfif" class="bg" alt="Background">
+
+  <div class="content-wrapper">
+    <div class="content">
+        <h1 class="title">Spendy – Budget<br>Tracker</h1>
+        <p class="subtitle">Manage your money wisely with ease.</p>
+        <a href="views/SignUp.html" class="cta-btn">Get Started</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Smooth page transitions
+  document.querySelectorAll('a[href$=".html"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && !href.startsWith('#') && !href.startsWith('http')) {
+        e.preventDefault();
+        document.body.style.transition = 'opacity 0.12s ease-out';
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+          window.location.href = href;
+        }, 120);
+      }
+    });
+  });
+</script>
+
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>

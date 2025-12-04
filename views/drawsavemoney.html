@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Plans</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #01143D;
+            --bg: #E8ECEF;
+            --card: #FFFFFF;
+            --text-dark: #1E2A39;
+            --text-muted: #A9AEB4;
+            --progress: #4AB3FF;
+            --progress-bg: #D7DDE4;
+            --danger: #E53535;
+            --success: #1DAA6F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 100px;
+            background: var(--navy);
+            margin: 20px 10px 20px 20px;
+            border-top-right-radius: 28px;
+            border-top-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            border-bottom-left-radius: 28px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .sidebar img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .sidebar .logo {
+            margin-top:-15px;
+            width: 95px;
+            height: 95px;
+        }
+
+        .nav-icon {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icon .hover-arch {
+            position: absolute;
+            width: 110px;
+            height: 120px;
+            margin-left: 33px;
+            object-fit: contain;
+        }
+
+        .nav-icon .active-icon {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main {
+            flex: 1;
+            padding: 24px 48px 32px 20px; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .top-icons {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .top-icons img {
+        width: 50px;
+        height: 50px;
+        border-radius: 24px;
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    /* Notification System */
+    .notification-wrapper {
+        position: relative;
+    }
+
+    .notification-icon-wrapper {
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .notification-icon-wrapper:hover {
+        transform: scale(1.05);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        background: #E53535;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        border: 2px solid #FFFFFF;
+        z-index: 10;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.2s;
+    }
+
+    .notification-badge.show {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .notification-dropdown {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 380px;
+        max-height: 500px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+        pointer-events: none;
+        transition: all 0.2s;
+        overflow: hidden;
+    }
+
+    .notification-dropdown.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: all;
+    }
+
+    .notification-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .notification-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1E2A39;
+    }
+
+    .notification-header button {
+        background: none;
+        border: none;
+        color: #A9AEB4;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .notification-header button:hover {
+        background: #E8ECEF;
+        color: #1E2A39;
+    }
+
+    .notification-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .notification-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        gap: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .notification-item:hover {
+        background: #E8ECEF;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-icon-large {
+        font-size: 24px;
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #E8ECEF;
+        border-radius: 10px;
+    }
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-message {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1E2A39;
+        margin-bottom: 4px;
+        line-height: 1.4;
+    }
+
+    .notification-time {
+        font-size: 12px;
+        color: #A9AEB4;
+    }
+
+    .notification-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: #A9AEB4;
+        font-size: 14px;
+    }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 440px;
+            gap: 16px;
+            height: calc(100vh - 120px);
+        }
+
+        .left-content {
+            margin-left: -40px; 
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            overflow: hidden;
+        }
+
+        .section {
+            margin: 0;
+            width: 100%;
+            max-height: 340px;
+            gap: 10px;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+            min-height: 0;
+        }
+
+        .section-header {
+            background: var(--navy);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-size: 20px;
+            font-weight: 600;
+            width: 100%;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .plans-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-right: -8px;
+            min-height: 0;
+        }
+
+        .plans-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .plans-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .plans-scroll::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 999px;
+        }
+
+        .plan-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            gap: 28px;
+            box-shadow: 0 12px 24px rgba(8, 26, 81, 0.08);
+            min-height: 150px;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .plan-info {
+            flex: 1;
+        }
+
+        .plan-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .plan-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .plan-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .progress-wrapper {
+            margin: 14px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--progress-bg);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--progress);
+            border-radius: inherit;
+        }
+
+        .plan-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+
+        .plan-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .edit-link {
+            color: var(--navy);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .draw-btn-wrapper {
+            position: relative;
+            width: 160px;
+            margin-top: auto;
+        }
+
+        .draw-btn {
+            width: 160px;
+            height: 55px;
+            border: none;
+            background: var(--navy);
+            border-radius: 16px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            z-index: 1;
+        }
+
+        .right-panel {
+            background: #1B2B42;
+            border-radius: 30px;
+            padding: 26px 30px 32px;
+            color: #fff;
+            height: 100%;
+            box-shadow: 0 12px 32px rgba(8, 26, 81, 0.15);
+            margin-left: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .right-panel h2 {
+            font-size: 24px;
+            margin-bottom: 18px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .input {
+            width: 100%;
+            border: none;
+            border-radius: 18px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 16px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .input:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* Custom dropdown styling to match reference image */
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-dropdown-header {
+            background: rgba(255,255,255,0.15);
+            border-radius: 18px 18px 0 0;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .custom-dropdown-header:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .custom-dropdown-header .caret {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            transition: transform 0.2s;
+        }
+
+        .custom-dropdown.open .custom-dropdown-header .caret {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-options {
+            background: rgba(255,255,255,0.1);
+            border-radius: 0 0 18px 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .custom-dropdown.open .custom-dropdown-options {
+            max-height: 300px;
+        }
+
+        .custom-dropdown-option {
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .custom-dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-dropdown-option:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .custom-dropdown-option.selected {
+            background: rgba(74, 179, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Hide native select, use custom dropdown */
+        select.input.custom-select-hidden {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            height: 0;
+            width: 0;
+        }
+
+        .save-btn {
+            width: 100%;
+            border: none;
+            border-radius: 32px;
+            padding: 16px;
+            background: #4AB3FF;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Transaction history scrollbar styling */
+        .transaction-scroll {
+            overflow-y: auto !important;
+            overflow-x: hidden;
+        }
+
+        .transaction-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .transaction-scroll::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .transaction-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        .transaction-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Firefox scrollbar */
+        .transaction-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 1200px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <a href="DashboardExpenses.html" style="text-decoration: none;">
+            <img src="../images/spendylogo.png" alt="Spendy logo" class="logo">
+            </a>
+            <div class="nav-icon" onclick="if(typeof smoothPageTransition==='function'){smoothPageTransition('DashboardExpenses.html');}else{window.location.href='DashboardExpenses.html';}" style="cursor: pointer;">
+                <img src="../images/dashboardicon.png" alt="Dashboard">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='savings.html'" style="cursor: pointer;">
+                <img src="../images/archsavingshover.png" alt="Active" class="hover-arch">
+                <img src="../images/savingsicon.png" alt="Savings" class="active-icon">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+                <img src="../images/Windows 10 Settings - iconSvg.co.png" alt="Settings">
+            </div>
+            <div class="nav-icon" style="margin-top:auto; cursor: pointer;" onclick="handleLogout()">
+                <img src="../images/logouticon.png" alt="Logout">
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="page-header">
+                <h1 class="page-title">Savings Plans</h1>
+                <div class="top-icons">
+                    <div class="notification-wrapper">
+                        <div class="notification-icon-wrapper" onclick="toggleNotifications()">
+                            <img src="../images/notificon.png" alt="Notifications" id="notificationIcon">
+                            <span class="notification-badge" id="notificationBadge"></span>
+                        </div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button onclick="loadNotifications()">Refresh</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon" onclick="window.location.href='profile.html'" style="cursor: pointer;">
+                </div>
+            </header>
+
+            <section class="layout">
+                <div>
+                    <div class="section">
+                        <div class="section-header">Active Plans</div>
+                        <div id="activePlans" class="plans-scroll"></div>
+                    </div>
+
+                    <div class="section" style="margin-top:20px;">
+                        <div class="section-header">Ended Plans</div>
+                        <div id="endedPlans" class="plans-scroll"></div>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <!-- Save Money panel -->
+                    <div id="panelSave" style="display:flex;flex-direction:column;height:100%;overflow:hidden;min-height:0;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-shrink:0;">
+                            <span style="font-size:24px;cursor:pointer" onclick="window.location.href='savings.html'">←</span>
+                            <div>
+                                <h2 style="margin:0;">Save Money</h2>
+                                <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:4px;">Update your savings progress</div>
+                            </div>
+                        </div>
+
+                        <div class="field" style="background:rgba(255,255,255,0.06);border-radius:14px;padding:14px;margin-bottom:16px;flex-shrink:0;">
+                            <div id="panelPlanName" style="text-align:center;font-weight:700;margin-bottom:8px;">Gaming PC</div>
+                            <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;">
+                                <div id="panelAmount" style="text-align:center;font-weight:700;font-size:18px">₱30,000 / ₱40,000</div>
+                                <div style="height:8px;background:var(--progress-bg);border-radius:999px;margin-top:8px;overflow:hidden;">
+                                    <div id="panelProgress" style="height:100%;background:var(--progress);width:75%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field" style="flex-shrink:0;">
+                            <input class="input" id="amountInput" placeholder="Enter amount" />
+                        </div>
+
+                        <div class="field" style="flex-shrink:0;">
+                            <div class="custom-dropdown" id="fundingSourceDropdown">
+                                <div class="custom-dropdown-header" onclick="toggleDropdown('fundingSourceDropdown')">
+                                    <span id="fundingSourceLabel">Funding Source</span>
+                                    <span class="caret">^</span>
+                                </div>
+                                <div class="custom-dropdown-options">
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('fundingSource', 'GCash', 'fundingSourceDropdown')">Gcash</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('fundingSource', 'Local Bank', 'fundingSourceDropdown')">Local Bank</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('fundingSource', 'Remaining Budget', 'fundingSourceDropdown')">Remaining Budget</div>
+                                </div>
+                                <select class="input custom-select-hidden" id="fundingSource">
+                                    <option value="">Funding Source</option>
+                                    <option value="GCash">GCash</option>
+                                    <option value="Local Bank">Local Bank</option>
+                                    <option value="Remaining Budget">Remaining Budget</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:12px;margin-bottom:16px;flex-shrink:0;">
+                            <button class="save-btn" id="doSaveBtn" type="button" style="flex:1">Save Money</button>
+                            <button id="openWithdrawBtn" type="button" style="background:#E53535;border:none;color:#fff;border-radius:24px;padding:12px 18px;cursor:pointer">Withdraw</button>
+                        </div>
+
+                        <div style="font-weight:700;margin-bottom:8px;flex-shrink:0;">Transaction History</div>
+                        <div id="transactionList" style="flex:1;overflow-y:auto;min-height:100px;max-height:300px;padding-right:4px;" class="transaction-scroll"></div>
+                    </div>
+
+                    <!-- Withdraw panel -->
+                    <div id="panelWithdraw" style="display:none;flex-direction:column;height:100%;overflow:hidden;min-height:0;">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-shrink:0;">
+                            <span style="font-size:24px;cursor:pointer" onclick="showSavePanel()">←</span>
+                            <div>
+                                <h2 style="margin:0;">Withdraw Money</h2>
+                                <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:4px;">Update your savings progress</div>
+                            </div>
+                        </div>
+
+                        <div class="field" style="background:rgba(255,255,255,0.06);border-radius:14px;padding:14px;margin-bottom:16px;flex-shrink:0;">
+                            <div id="panelPlanNameWithdraw" style="text-align:center;font-weight:700;margin-bottom:8px;">Gaming PC</div>
+                            <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;">
+                                <div id="panelAmountWithdraw" style="text-align:center;font-weight:700;font-size:18px">₱30,000 / ₱40,000</div>
+                                <div style="height:8px;background:var(--progress-bg);border-radius:999px;margin-top:8px;overflow:hidden;">
+                                    <div id="panelProgressWithdraw" style="height:100%;background:var(--progress);width:75%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field" style="flex-shrink:0;">
+                            <input class="input" id="withdrawAmountInput" placeholder="Enter amount" />
+                        </div>
+
+                        <div class="field" style="flex-shrink:0;">
+                            <div class="custom-dropdown" id="destinationAccountDropdown">
+                                <div class="custom-dropdown-header" onclick="toggleDropdown('destinationAccountDropdown')">
+                                    <span id="destinationAccountLabel">Select Destination Account</span>
+                                    <span class="caret">^</span>
+                                </div>
+                                <div class="custom-dropdown-options">
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('destinationAccountSelect', 'Main Wallet Account', 'destinationAccountDropdown')">Main Wallet Account</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('destinationAccountSelect', 'LandBank', 'destinationAccountDropdown')">LandBank</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('destinationAccountSelect', 'non-enrolled', 'destinationAccountDropdown')">Non‑enrolled Account</div>
+                                </div>
+                                <select class="input custom-select-hidden" id="destinationAccountSelect">
+                                    <option value="">Select Destination Account</option>
+                                    <option value="Main Wallet Account">Main Wallet Account</option>
+                                    <option value="LandBank">LandBank</option>
+                                    <option value="non-enrolled">Non‑enrolled Account</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;gap:12px;margin-bottom:16px;flex-shrink:0;">
+                            <button class="save-btn" id="withdrawSaveBtn" type="button" style="background:#4AB3FF">Save Money</button>
+                            <button id="withdrawPerformBtn" type="button" style="background:#E53535;border:none;color:#fff;border-radius:24px;padding:12px 18px;cursor:pointer">Withdraw</button>
+                        </div>
+
+                        <div style="font-weight:700;margin-bottom:8px;flex-shrink:0;">Transaction History</div>
+                        <div id="transactionListWithdraw" style="flex:1;overflow-y:auto;min-height:100px;max-height:300px;padding-right:4px;" class="transaction-scroll"></div>
+                    </div>
+
+                    <!-- Non-enrolled standalone panel (optional explicit screen) -->
+                    <div id="panelNonEnrolled" style="display:none">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                            <span style="font-size:24px;cursor:pointer" onclick="showWithdrawPanel()">←</span>
+                            <div>
+                                <h2 style="margin:0;">Non‑enrolled Account</h2>
+                                <div style="color:rgba(255,255,255,0.7);font-size:13px;margin-top:4px;">Update your savings progress</div>
+                            </div>
+                        </div>
+
+                        <div class="field" style="background:rgba(255,255,255,0.06);border-radius:14px;padding:14px;margin-bottom:16px;">
+                            <div id="panelPlanNameNE" style="text-align:center;font-weight:700;margin-bottom:8px;">Gaming PC</div>
+                            <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;">
+                                <div id="panelAmountNE" style="text-align:center;font-weight:700;font-size:18px">₱30,000 / ₱40,000</div>
+                                <div style="height:8px;background:var(--progress-bg);border-radius:999px;margin-top:8px;overflow:hidden;">
+                                    <div id="panelProgressNE" style="height:100%;background:var(--progress);width:75%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <input class="input" id="withdrawAmountInputNE" placeholder="Enter amount" type="number" min="0.01" step="0.01" />
+                        </div>
+
+                        <div class="field">
+                            <div class="custom-dropdown" id="neBankDropdown">
+                                <div class="custom-dropdown-header" onclick="toggleDropdown('neBankDropdown')">
+                                    <span id="neBankLabel">Select Bank</span>
+                                    <span class="caret">^</span>
+                                </div>
+                                <div class="custom-dropdown-options">
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('ne_bank2', 'LandBank', 'neBankDropdown')">LandBank</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('ne_bank2', 'BPI', 'neBankDropdown')">BPI</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('ne_bank2', 'BDO', 'neBankDropdown')">BDO</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('ne_bank2', 'Metrobank', 'neBankDropdown')">Metrobank</div>
+                                    <div class="custom-dropdown-option" onclick="selectDropdownOption('ne_bank2', 'Security Bank', 'neBankDropdown')">Security Bank</div>
+                                </div>
+                                <select class="input custom-select-hidden" id="ne_bank2" required>
+                                    <option value="">Select Bank</option>
+                                    <option>LandBank</option>
+                                    <option>BPI</option>
+                                    <option>BDO</option>
+                                    <option>Metrobank</option>
+                                    <option>Security Bank</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <input class="input" id="ne_account2" placeholder="Account Number" required />
+                        </div>
+                        <div class="field">
+                            <input class="input" id="ne_receiver2" placeholder="Receiver Name" required />
+                        </div>
+                        <div class="field">
+                            <input class="input" id="ne_mobile2" placeholder="+63 Optional" />
+                        </div>
+
+                        <div style="margin-top:12px;">
+                            <button class="save-btn" id="proceedNonEnrolled" type="button">Withdraw</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Custom dropdown functions
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const isOpen = dropdown.classList.contains('open');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.custom-dropdown.open').forEach(dd => {
+                if (dd.id !== dropdownId) {
+                    dd.classList.remove('open');
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.classList.toggle('open');
+        }
+
+        function selectDropdownOption(selectId, value, dropdownId) {
+            const select = document.getElementById(selectId);
+            const dropdown = document.getElementById(dropdownId);
+            const labelId = selectId === 'fundingSource' ? 'fundingSourceLabel' : 
+                           selectId === 'destinationAccountSelect' ? 'destinationAccountLabel' :
+                           selectId === 'ne_bank2' ? 'neBankLabel' : null;
+            
+            if (select) {
+                // Set the value on the select element
+                select.value = value;
+                // Also set it as a data attribute for backup
+                select.setAttribute('data-selected-value', value);
+                // Trigger change event for existing listeners
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                console.log('Dropdown selected:', selectId, '=', value);
+            }
+            
+            if (labelId) {
+                const label = document.getElementById(labelId);
+                if (label) {
+                    // Update label text - handle special cases
+                    if (value === 'GCash') {
+                        label.textContent = 'Gcash';
+                    } else if (value === 'non-enrolled') {
+                        label.textContent = 'Non‑enrolled Account';
+                    } else {
+                        label.textContent = value;
+                    }
+                    console.log('Label updated:', labelId, '=', label.textContent);
+                }
+            }
+            
+            // Update selected state in options
+            if (dropdown) {
+            dropdown.querySelectorAll('.custom-dropdown-option').forEach(opt => {
+                opt.classList.remove('selected');
+                    const optText = opt.textContent.trim();
+                    if (optText === value || 
+                        (value === 'GCash' && optText === 'Gcash') ||
+                        (value === 'non-enrolled' && (optText === 'Non‑enrolled Account' || optText === 'Non-enrolled Account'))) {
+                    opt.classList.add('selected');
+                }
+            });
+            }
+            
+            // Close dropdown
+            if (dropdown) {
+            dropdown.classList.remove('open');
+            }
+            
+            // Handle non-enrolled navigation IMMEDIATELY - no delay
+            if (selectId === 'destinationAccountSelect' && value === 'non-enrolled') {
+                showNonEnrolledPanel();
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.custom-dropdown.open').forEach(dd => {
+                    dd.classList.remove('open');
+                });
+            }
+        });
+
+        // Plans loaded from database
+        let savingsPlans = [];
+        
+        async function loadPlans() {
+            try {
+                // Get user_id from profile or use default
+                let userId = 'user002'; // Default to match profile
+                try {
+                    const profileResponse = await fetch('../api/get_profile.php');
+                    if (profileResponse.ok) {
+                        const profileData = await profileResponse.json();
+                        if (profileData && profileData.userId) {
+                            userId = profileData.userId;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Could not get user ID from profile, using default');
+                }
+                
+                const response = await fetch(`../api/get_savings.php?user_id=${userId}`);
+                const data = await response.json();
+                if (data.success) {
+                    savingsPlans = data.plans;
+                    renderPlans();
+                }
+            } catch (error) {
+                console.error('Failed to load plans:', error);
+            }
+        }
+        
+        loadPlans();
+
+        function isPlanLocked(plan) {
+            const value = plan?.is_locked;
+            return value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true';
+        }
+
+        function isPlanLocked(plan) {
+            const value = plan?.is_locked;
+            return value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true';
+        }
+
+        function renderPlanCard(plan) {
+            const progress = Math.round((plan.saved_amount / plan.goal_amount) * 100);
+            const isActive = plan.status === 'Active';
+            const isLocked = isPlanLocked(plan);
+            const actionLabel = isLocked ? 'Save Money' : 'Draw/Save Money';
+            return `
+                <div class="plan-card">
+                    <div class="plan-info">
+                        <div class="plan-name">${plan.plan_name}</div>
+                        <div class="plan-amount">₱${plan.saved_amount.toLocaleString()} / ₱${plan.goal_amount.toLocaleString()}</div>
+                        <div class="progress-wrapper">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width:${Math.min(progress,100)}%"></div>
+                            </div>
+                            <div class="plan-meta">
+                                <span>${progress}% complete</span>
+                                <span>Target Date: ${plan.end_date}</span>
+                            </div>
+                        </div>
+                        ${!isActive ? `<div class="status-pill" style="color:${plan.status === 'Finished' ? 'var(--success)' : 'var(--danger)'};">
+                            ${plan.status === 'Finished' ? 'Finished ✔' : 'Unfinished ✖'}
+                        </div>` : ''}
+                    </div>
+                    <div class="plan-actions">
+                        ${isActive ? `<span class="edit-link" onclick="editPlan('${plan.savings_id}')">Edit</span>` : ''}
+                        <div class="draw-btn-wrapper">
+                            <button class="draw-btn" onclick="saveMoney('${plan.savings_id}')">${actionLabel}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlans() {
+            const activeContainer = document.getElementById('activePlans');
+            const endedContainer = document.getElementById('endedPlans');
+            activeContainer.innerHTML = savingsPlans.filter(p => p.status === 'Active').map(renderPlanCard).join('');
+            endedContainer.innerHTML = savingsPlans.filter(p => p.status !== 'Active').map(renderPlanCard).join('');
+        }
+ 
+        renderPlans();
+
+        // Helper to read savingsId from URL and auto-open the correct plan panel
+        function getSavingsIdFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('savingsId');
+        }
+
+        const initialSavingsId = getSavingsIdFromQuery();
+        if (initialSavingsId) {
+            saveMoney(initialSavingsId);
+        }
+
+        function editPlan(savingsId) {
+            window.location.href = `edit-savings.html?savingsId=${encodeURIComponent(savingsId)}`;
+        }
+
+        window.currentPanelPlanId = null;
+
+        async function saveMoney(savingsId) {
+            try {
+                // Load plan data
+                const planResponse = await fetch(`../api/get_savings_by_id.php?savingsId=${encodeURIComponent(savingsId)}`);
+                const planData = await planResponse.json();
+                
+                if (!planData.success) {
+                    alert('Plan not found: ' + planData.error);
+                    return;
+                }
+                
+                const plan = planData.plan;
+                window.currentPanelPlanId = savingsId;
+                
+            // Check if plan is locked (handle various formats: boolean, int, string)
+            const isLocked = plan.is_locked === true || plan.is_locked === 1 || plan.is_locked === '1' || String(plan.is_locked).toLowerCase() === 'true';
+            window.currentPlanIsLocked = isLocked;
+
+                const amountText = `₱${plan.saved_amount.toLocaleString()} / ₱${plan.goal_amount.toLocaleString()}`;
+                const pct = Math.round((plan.saved_amount / plan.goal_amount) * 100);
+
+                document.getElementById('panelPlanName').textContent = plan.plan_name;
+                document.getElementById('panelAmount').textContent = amountText;
+                document.getElementById('panelProgress').style.width = `${Math.min(pct,100)}%`;
+
+                document.getElementById('panelPlanNameWithdraw').textContent = plan.plan_name;
+                document.getElementById('panelAmountWithdraw').textContent = amountText;
+                document.getElementById('panelProgressWithdraw').style.width = `${Math.min(pct,100)}%`;
+
+                document.getElementById('panelPlanNameNE').textContent = plan.plan_name;
+                document.getElementById('panelAmountNE').textContent = amountText;
+                document.getElementById('panelProgressNE').style.width = `${Math.min(pct,100)}%`;
+                
+                // Show/hide withdraw button based on locked status
+                const withdrawBtn = document.getElementById('openWithdrawBtn');
+                if (withdrawBtn) {
+                    if (isLocked) {
+                        withdrawBtn.style.display = 'none';
+                    } else {
+                        withdrawBtn.style.display = 'block';
+                    }
+                }
+
+                // Load transaction history
+                const txResponse = await fetch(`../api/get_transactions.php?savingsId=${encodeURIComponent(savingsId)}`);
+                const txData = await txResponse.json();
+                
+                const txs = txData.success ? txData.transactions.map(tx => ({
+                    date: tx.date,
+                    amount: tx.transaction_type === 'deposit' ? tx.amount : -tx.amount,
+                    label: '' // Transaction log doesn't store fund_source, but you can add it later
+                })) : [];
+
+                const listHtml = txs.length > 0 ? txs.map(tx => {
+                    const color = tx.amount < 0 ? 'var(--danger)' : 'var(--success)';
+                    const amountText = tx.amount < 0 ? `-₱${Math.abs(tx.amount).toLocaleString()}` : `₱${tx.amount.toLocaleString()}`;
+                    const labelHtml = tx.label ? `<div style="font-size:11px;color:#9aa3b0;margin-top:4px">${tx.label}</div>` : '';
+                    return `
+                        <div style="background:rgba(255,255,255,0.1);padding:10px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <div style="font-size:13px;color:rgba(255,255,255,0.9)">
+                                ${tx.date}
+                                ${labelHtml}
+                            </div>
+                            <div style="font-weight:700;color:${color}">${amountText}</div>
+                        </div>
+                    `;
+                }).join('') : '<div style="color:rgba(255,255,255,0.5);text-align:center;padding:20px;">No transactions yet</div>';
+
+                document.getElementById('transactionList').innerHTML = listHtml;
+                document.getElementById('transactionListWithdraw').innerHTML = listHtml;
+
+                const amtEl = document.getElementById('amountInput');
+                if (amtEl) amtEl.value = '';
+                const wAmt = document.getElementById('withdrawAmountInput');
+                if (wAmt) wAmt.value = '';
+                showSavePanel();
+            } catch (error) {
+                alert('Failed to load plan: ' + error.message);
+            }
+        }
+
+        function showSavePanel() {
+            document.getElementById('panelSave').style.display = 'flex';
+            document.getElementById('panelWithdraw').style.display = 'none';
+            document.getElementById('panelNonEnrolled').style.display = 'none';
+            // Reset destination account selection when showing save panel
+            document.getElementById('destinationAccountSelect').value = '';
+            document.getElementById('destinationAccountLabel').textContent = 'Select Destination Account';
+            document.querySelectorAll('#destinationAccountDropdown .custom-dropdown-option').forEach(opt => opt.classList.remove('selected'));
+        }
+
+        function showWithdrawPanel() {
+            document.getElementById('panelSave').style.display = 'none';
+            document.getElementById('panelWithdraw').style.display = 'flex';
+            document.getElementById('panelNonEnrolled').style.display = 'none';
+            // Reset destination account selection when showing withdraw panel
+            document.getElementById('destinationAccountSelect').value = '';
+            document.getElementById('destinationAccountLabel').textContent = 'Select Destination Account';
+            document.querySelectorAll('#destinationAccountDropdown .custom-dropdown-option').forEach(opt => opt.classList.remove('selected'));
+        }
+
+        function showNonEnrolledPanel() {
+            document.getElementById('panelSave').style.display = 'none';
+            document.getElementById('panelWithdraw').style.display = 'none';
+            document.getElementById('panelNonEnrolled').style.display = 'block';
+            
+            // Copy amount from withdraw panel if it exists
+            const withdrawAmount = document.getElementById('withdrawAmountInput').value;
+            if (withdrawAmount) {
+                document.getElementById('withdrawAmountInputNE').value = withdrawAmount;
+            }
+            
+            // Clear previous bank details
+            document.getElementById('ne_bank2').value = '';
+            document.getElementById('ne_account2').value = '';
+            document.getElementById('ne_receiver2').value = '';
+            document.getElementById('ne_mobile2').value = '';
+        }
+
+        document.getElementById('doSaveBtn').addEventListener('click', async () => {
+            const savingsId = window.currentPanelPlanId;
+            if (!savingsId) return alert('Select a plan first.');
+            
+            const amt = parseFloat(document.getElementById('amountInput').value || '0');
+            const source = document.getElementById('fundingSource').value || '';
+            if (!amt || amt <= 0) return alert('Enter an amount to save.');
+            
+            const formData = new FormData();
+            formData.append('savings_id', savingsId);
+            formData.append('amount', amt);
+            formData.append('transaction_type', 'deposit');
+            formData.append('fund_source', source);
+            
+            try {
+                const response = await fetch('../api/draw_save_money.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Money saved successfully!');
+                    await loadPlans();
+                    await saveMoney(savingsId);
+                    
+                    // If source is "Remaining Budget", store info for dashboard update
+                    if (source === 'Remaining Budget') {
+                        // Store in sessionStorage so dashboard can pick it up
+                        sessionStorage.setItem('remainingBudgetDeduction', amt.toString());
+                        sessionStorage.setItem('remainingBudgetUpdateTime', Date.now().toString());
+                        
+                        // Trigger custom event for any open dashboard pages
+                        window.dispatchEvent(new CustomEvent('savingsUpdated', { 
+                            detail: { fund_source: source, amount: amt } 
+                        }));
+                    }
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Failed to save money: ' + error.message);
+            }
+        });
+
+        document.getElementById('openWithdrawBtn').addEventListener('click', () => {
+            const plan = savingsPlans.find(p => p.savings_id === window.currentPanelPlanId);
+            if (!plan) return alert('Select a plan first.');
+            showWithdrawPanel();
+        });
+
+        // Keep this listener for the hidden select element (backup)
+        const destinationAccountSelect = document.getElementById('destinationAccountSelect');
+        if (destinationAccountSelect) {
+            destinationAccountSelect.addEventListener('change', (e) => {
+                console.log('Destination account select changed:', e.target.value);
+            if (e.target.value === 'non-enrolled') {
+                // Navigate to non-enrolled panel immediately
+                showNonEnrolledPanel();
+            }
+        });
+        }
+
+        document.getElementById('withdrawPerformBtn').addEventListener('click', async () => {
+            const savingsId = window.currentPanelPlanId;
+            if (!savingsId) return alert('Select a plan first.');
+            
+            // Check if plan is locked - block withdrawals
+            if (window.currentPlanIsLocked) {
+                alert('This savings plan is locked. Withdrawals are not allowed.');
+                return;
+            }
+            
+            const amt = parseFloat(document.getElementById('withdrawAmountInput').value || '0');
+            if (!amt || amt <= 0) return alert('Enter an amount to withdraw.');
+
+            // Get destination from both hidden select and label (in case custom dropdown was used)
+            const destSelect = document.getElementById('destinationAccountSelect');
+            const destLabel = document.getElementById('destinationAccountLabel');
+            let dest = '';
+            
+            // First, try to get value from select element
+            if (destSelect && destSelect.value) {
+                dest = destSelect.value;
+            }
+            
+            // If select is empty, try to get from label text
+            if (!dest && destLabel) {
+                const labelText = destLabel.textContent.trim();
+                // Map label text back to value
+                if (labelText === 'Non‑enrolled Account' || labelText === 'Non-enrolled Account') {
+                    dest = 'non-enrolled';
+                } else if (labelText === 'Main Wallet Account') {
+                    dest = 'Main Wallet Account';
+                } else if (labelText === 'LandBank') {
+                    dest = 'LandBank';
+                } else if (labelText !== 'Select Destination Account' && labelText !== '') {
+                    // Use label text as fallback
+                    dest = labelText;
+                }
+            }
+            
+            // Debug: log the values
+            console.log('Destination selection:', {
+                selectValue: destSelect ? destSelect.value : 'N/A',
+                selectDataAttr: destSelect ? destSelect.getAttribute('data-selected-value') : 'N/A',
+                labelText: destLabel ? destLabel.textContent : 'N/A',
+                finalDest: dest
+            });
+            
+            // If still no destination, check data attribute
+            if (!dest || dest === '' || dest === 'Select Destination Account') {
+                if (destSelect && destSelect.getAttribute('data-selected-value')) {
+                    dest = destSelect.getAttribute('data-selected-value');
+                    console.log('Using data attribute value:', dest);
+                }
+            }
+            
+            if (!dest || dest === '' || dest === 'Select Destination Account') {
+                alert('Please select a destination account. Current selection: ' + (destLabel ? destLabel.textContent : 'none'));
+                return;
+            }
+
+            // Non-enrolled accounts should be handled in the non-enrolled panel
+            // If somehow this is called with non-enrolled, navigate to that panel
+            if (dest === 'non-enrolled') {
+                showNonEnrolledPanel();
+                return;
+            }
+
+            // Handle enrolled accounts only
+            const formData = new FormData();
+            formData.append('savings_id', savingsId);
+            formData.append('amount', amt);
+            formData.append('transaction_type', 'withdraw');
+            formData.append('fund_source', dest);
+            
+            try {
+                const response = await fetch('../api/draw_save_money.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Withdrawal successful!');
+                    await loadPlans();
+                    await saveMoney(savingsId);
+                    showSavePanel();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Withdraw error:', error);
+                alert('Failed to withdraw money: ' + error.message);
+            }
+        });
+
+        document.getElementById('proceedNonEnrolled').addEventListener('click', async () => {
+            const savingsId = window.currentPanelPlanId;
+            if (!savingsId) return alert('Select a plan first.');
+            
+            // Check if plan is locked - block withdrawals
+            if (window.currentPlanIsLocked) {
+                alert('This savings plan is locked. Withdrawals are not allowed.');
+                return;
+            }
+            
+            // Get amount from the non-enrolled panel input
+            const amt = parseFloat(document.getElementById('withdrawAmountInputNE').value || '0');
+            if (!amt || amt <= 0) {
+                alert('Enter an amount to withdraw.');
+                return;
+            }
+            
+            // Validate all required bank details - CRITICAL: All must be filled
+            const bank = document.getElementById('ne_bank2').value.trim();
+            const account = document.getElementById('ne_account2').value.trim();
+            const receiver = document.getElementById('ne_receiver2').value.trim();
+            
+            if (!bank || !account || !receiver) {
+                alert('Please fill in all required bank details:\n- Bank\n- Account Number\n- Receiver Name');
+                return;
+            }
+            
+            // Process withdrawal with validated bank details
+            const formData = new FormData();
+            formData.append('savings_id', savingsId);
+            formData.append('amount', amt);
+            formData.append('transaction_type', 'withdraw');
+            formData.append('fund_source', `${bank} - ${account} (${receiver})`);
+            
+            try {
+                const response = await fetch('../api/draw_save_money.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Withdrawal successful!');
+                    // Clear all form fields
+                    document.getElementById('ne_bank2').value = '';
+                    document.getElementById('ne_account2').value = '';
+                    document.getElementById('ne_receiver2').value = '';
+                    document.getElementById('ne_mobile2').value = '';
+                    document.getElementById('withdrawAmountInputNE').value = '';
+                    document.getElementById('withdrawAmountInput').value = '';
+                    document.getElementById('destinationAccountSelect').value = '';
+                    
+                    await loadPlans();
+                    await saveMoney(savingsId);
+                    showSavePanel();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Failed to withdraw money: ' + error.message);
+            }
+        });
+
+// Load profile image for header
+async function loadHeaderProfileImage() {
+    const headerProfileIcon = document.getElementById('headerProfileIcon');
+    
+    if (!headerProfileIcon) {
+        return;
+    }
+    
+    // Set default image first
+    const defaultImage = '../images/blankprofile.png';
+    headerProfileIcon.src = defaultImage;
+    
+    try {
+        const response = await fetch('../api/get_profile.php', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const userData = await response.json();
+            
+            // Check if user has uploaded a profile image
+            // Base64 data URIs start with "data:image/" and can be very long
+            if (userData && userData.profileImage && 
+                userData.profileImage.trim() !== '' && 
+                userData.profileImage !== 'null' &&
+                userData.profileImage.length > 0) {
+                // User has uploaded a profile image (base64 data URI or file path)
+                try {
+                    headerProfileIcon.src = userData.profileImage;
+                    // Verify image loaded successfully
+                    headerProfileIcon.onerror = function() {
+                        console.warn('Failed to load profile image, using default');
+                        headerProfileIcon.src = defaultImage;
+                    };
+                } catch (imgError) {
+                    console.error('Error setting profile image:', imgError);
+                    headerProfileIcon.src = defaultImage;
+                }
+                } else {
+                    // No profile image, use default
+                headerProfileIcon.src = defaultImage;
+                }
+        } else {
+            // API call failed, use default
+            headerProfileIcon.src = defaultImage;
+        }
+    } catch (error) {
+        console.error('Error loading profile image:', error);
+        // On error, ensure default image is shown
+        headerProfileIcon.src = defaultImage;
+    }
+}
+
+// Load profile image on page load
+loadHeaderProfileImage();
+
+// Logout function
+function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        fetch('../api/logout.php', { method: 'POST' })
+            .then(() => window.location.href = 'login.html')
+            .catch(() => window.location.href = 'login.html');
+    }
+}
+    </script>
+    <script src="../js/notification-system.js"></script>
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>

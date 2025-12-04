@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Income</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            --navy: #01143D;
+            --bg: #E8ECEF;
+            --card: #FFFFFF;
+            --text-dark: #1E2A39;
+            --text-muted: #A9AEB4;
+            --progress: #4AB3FF;
+            --progress-bg: #D7DDE4;
+            --danger: #E53535;
+            --success: #1DAA6F;
+            --dark: #1B2B42;
+            --cyan: #43B3EF;
+            --gray: #3E4E65;
+            --light-gray: #3C4C64;
+            --green: #1FAC1F;
+            --red: #BB0000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Exact copy from savings.html */
+        .sidebar {
+            width: 100px;
+            background: var(--navy);
+            margin: 20px 10px 20px 20px;
+            border-top-right-radius: 28px;
+            border-top-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            border-bottom-left-radius: 28px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .sidebar img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .sidebar .logo {
+            margin-top: -15px;
+            width: 95px;
+            height: 95px;
+        }
+
+        .nav-icon {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-icon .hover-arch {
+            position: absolute;
+            width: 110px;
+            height: 120px;
+            margin-left: 33px;
+            object-fit: contain;
+        }
+
+        .nav-icon .active-icon {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Main content area */
+        .main {
+            flex: 1;
+            padding: 22px 48px 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .page-title {
+            font-size: 40px;
+            font-weight: 700;
+        }
+
+        .top-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-icons img {
+            width: 50px;
+            height: 50px;
+            border-radius: 24px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* Notification System */
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-icon-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .notification-icon-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid var(--card);
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .notification-badge.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 380px;
+            max-height: 500px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+
+        .notification-dropdown.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .notification-header button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .notification-header button:hover {
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notification-item:hover {
+            background: var(--bg);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon-large {
+            font-size: 24px;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .notification-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Content layout */
+        .content-row {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        /* Monthly Budget Snapshot Card */
+        .snapshot {
+            background: url('../images/snapshot.png') center/cover no-repeat;
+            border-radius: 32px;
+            padding: 28px 36px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+            min-height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .snapshot-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .snapshot h2 {
+            font-size: 26px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .snapshot-subtext {
+            font-size: 16px;
+            color: #43B3EF;
+            margin: 0;
+        }
+
+        .snapshot-subtext .highlight {
+            color: inherit;
+            font-weight: 600;
+        }
+
+        .balance {
+            font-family: 'Inter', sans-serif;
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .total-label {
+            font-size: 14px;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        .snapshot-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .month-btn {
+            background: white;
+            border: none;
+            color: #02224F;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .budget-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .budget-pill {
+            background: rgba(217, 217, 217, 0.56);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 510;
+            color: #FFFFFF;
+            font-size: 13px;
+        }
+
+        .snapshot-illustration {
+            width: 300px;
+            height: 100%;
+            object-fit: contain;
+            z-index: 1;
+            opacity: 0.9;
+        }
+
+        /* Financial Overview Card */
+        .overview-card {
+            background: #F8FBFF;
+            border-radius: 26px;
+            padding: 26px;
+            box-shadow: 0 12px 35px rgba(5, 34, 73, 0.08);
+            border: 1px solid #E1E8F3;
+        }
+
+        .overview-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: visible;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 10px 25px rgba(9, 27, 60, 0.08);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--navy);
+            margin: 4px 0;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--text-m);
+            margin-bottom: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-wave {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 70px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .change {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--green);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .change.negative {
+            background: var(--red);
+        }
+
+        .change i {
+            font-size: 10px;
+        }
+
+        /* Transactions Card */
+        .transactions {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 300px;
+            max-height: 100%;
+        }
+
+        .date-header {
+            background: var(--navy);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .date-header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .date-mode {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: white;
+            color: var(--navy);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .calendar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .calendar-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .tx-labels {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 8px;
+            padding: 0 8px;
+        }
+
+        .tx-labels span {
+            opacity: 0.7;
+        }
+
+        #transactions-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 10px;
+            min-height: 0;
+            max-height: 100%;
+        }
+
+        #transactions-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #transactions-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        #transactions-container::-webkit-scrollbar-thumb {
+            background: var(--cyan);
+            border-radius: 10px;
+        }
+
+        .tx-item {
+            background: white;
+            border-radius: 16px;
+            padding: 10px 12px;
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr;
+            align-items: center;
+            column-gap: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 8px;
+            border: 1px solid #F0F0F0;
+        }
+
+        .tx-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tx-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--navy);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .tx-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .tx-subtitle {
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+
+        .tx-amount {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--green);
+            justify-self: flex-start;
+            text-align: left;
+        }
+
+        .tx-time {
+            font-size: 13px;
+            color: #022268;
+            text-align: left;
+            justify-self: flex-start;
+        }
+
+        /* Add Transaction Panel */
+        .add-panel {
+            width: 450px;
+            background: var(--dark);
+            border-radius: 35px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .add-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .add-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .add-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
+        }
+
+        /* Auto-Save Popup */
+        .auto-save-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+
+        .auto-save-overlay.show {
+            display: flex;
+        }
+
+        .auto-save-popup {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 32px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auto-save-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auto-save-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .auto-save-header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .auto-save-amount {
+            background: linear-gradient(135deg, var(--progress) 0%, var(--cyan) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auto-save-amount .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .auto-save-amount .value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .auto-save-plans {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 24px;
+        }
+
+        .auto-save-plan-item {
+            padding: 16px;
+            border: 2px solid var(--progress-bg);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auto-save-plan-item:hover {
+            border-color: var(--progress);
+            background: rgba(74, 179, 255, 0.05);
+        }
+
+        .auto-save-plan-item.selected {
+            border-color: var(--progress);
+            background: rgba(74, 179, 255, 0.1);
+        }
+
+        .auto-save-plan-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .auto-save-plan-progress {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .auto-save-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .auto-save-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .auto-save-btn-primary {
+            background: var(--progress);
+            color: white;
+        }
+
+        .auto-save-btn-primary:hover {
+            background: var(--cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 179, 255, 0.3);
+        }
+
+        .auto-save-btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auto-save-btn-secondary {
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .auto-save-btn-secondary:hover {
+            background: var(--progress-bg);
+        }
+
+        /* Plan Type Selection */
+        .auto-save-plan-type-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .plan-type-option {
+            padding: 20px;
+            border: 2px solid var(--progress-bg);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--card);
+        }
+
+        .plan-type-option:hover {
+            border-color: var(--progress);
+            background: rgba(74, 179, 255, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 179, 255, 0.1);
+        }
+
+        .plan-type-option.selected {
+            border-color: var(--progress);
+            background: rgba(74, 179, 255, 0.1);
+        }
+
+        .plan-type-icon {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 12px;
+            color: var(--progress);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .plan-type-icon i {
+            font-size: 32px;
+        }
+        
+        .plan-type-option.selected .plan-type-icon {
+            color: var(--cyan);
+        }
+
+        .plan-type-label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .plan-type-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .add-title {
+            font-size: 30px;
+            font-weight: 700;
+            text-align: center;
+            margin-top: -10px;
+            margin-left: -150px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--gray);
+            transition: 0.3s;
+            border: none;
+            color: white;
+        }
+
+        .toggle-btn.active {
+            background: var(--cyan);
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            font-size: 18px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            display: block;
+        }
+        textarea.input-field {
+    min-height: 70px;
+    padding: 14px 18px;
+}
+
+        .category-label {
+            font-size: 20px;
+            font-weight: 500;
+            margin: -10px 0 -10px;
+            color: white;
+        }
+
+        .input-field {
+            width: 100%;
+            background: var(--gray);
+            border: none;
+            border-radius: 30px;
+            padding: 16px;
+            color: white;
+            font-size: 18px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-field:focus {
+            outline: none;
+            background: var(--light-gray);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .cat-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--light-gray);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            border: none;
+        }
+
+        .cat-btn:hover {
+            background: #556c88;
+        }
+
+        .cat-btn.selected {
+            background: var(--cyan);
+        }
+
+        .cat-btn i {
+            font-size: 28px;
+            color: white;
+        }
+
+        .calendar-section {
+            margin-top: 10px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .calendar-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #555;
+        }
+
+        .dot.active {
+            background: var(--cyan);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .day-name {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .day {
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .day:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .day.selected {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .day.today {
+            background: rgba(67, 179, 239, 0.3);
+        }
+
+        .save-btn {
+            margin-top: 20px;
+            background: var(--cyan);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 1400px) {
+            .content-row {
+                flex-direction: column;
+            }
+
+            .add-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <a href="DashboardExpenses.html" style="text-decoration: none;">
+                <img src="../images/spendylogo.png" alt="Spendy logo" class="logo">
+            </a>
+            <div class="nav-icon">
+                <img src="../images/archsavingshover.png" alt="Active" class="hover-arch">
+                <img src="../images/dashboardiconblue.png" alt="Dashboard" class="active-icon">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='savings.html'" style="cursor: pointer;">
+                <img src="../images/dashboardsavingsicon.png" alt="Savings">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+                <img src="../images/Windows 10 Settings - iconSvg.co.png" alt="Settings">
+            </div>
+            <div class="nav-icon" style="margin-top:auto; cursor: pointer;" onclick="handleLogout()">
+                <img src="../images/logouticon.png" alt="Logout">
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="page-header">
+                <h1 class="page-title">Overview</h1>
+                <div class="top-icons">
+                    <div class="notification-wrapper">
+                        <div class="notification-icon-wrapper" onclick="toggleNotifications()">
+                            <img src="../images/notificon.png" alt="Notifications" id="notificationIcon">
+                            <span class="notification-badge" id="notificationBadge"></span>
+                        </div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button onclick="loadNotifications()">Refresh</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon" onclick="window.location.href='profile.html'" style="cursor: pointer;" onerror="this.src='../images/blankprofile.png'">
+                </div>
+            </header>
+
+            <!-- Auto-Save Popup - Step 1: Plan Type Selection -->
+            <div class="auto-save-overlay" id="autoSaveOverlay">
+                <div class="auto-save-popup">
+                    <div class="auto-save-header">
+                        <h3>Auto-Save Opportunity</h3>
+                        <p>Save 5% of your income to a savings plan</p>
+                    </div>
+                    <div class="auto-save-amount">
+                        <div class="label">Amount to Save</div>
+                        <div class="value" id="autoSaveAmount">₱0.00</div>
+                    </div>
+                    <div class="auto-save-plan-type-selection" id="planTypeSelection">
+                        <div class="plan-type-option" onclick="selectPlanType('active')">
+                            <div class="plan-type-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="plan-type-label">Allocate to Active Plan</div>
+                            <div class="plan-type-desc">Add to an existing active savings plan</div>
+                        </div>
+                        <div class="plan-type-option" onclick="selectPlanType('ended')">
+                            <div class="plan-type-icon">
+                                <i class="fas fa-redo"></i>
+                            </div>
+                            <div class="plan-type-label">Allocate to Ended Plan</div>
+                            <div class="plan-type-desc">Reactivate an ended plan and continue saving</div>
+                        </div>
+                    </div>
+                    <!-- No Skip button - user must choose a plan type -->
+                </div>
+            </div>
+
+            <!-- Auto-Save Popup - Step 2: Plan Selection -->
+            <div class="auto-save-overlay" id="autoSavePlanListOverlay" style="display: none;">
+                <div class="auto-save-popup">
+                    <div class="auto-save-header">
+                        <h3 id="planListTitle">Select Savings Plan</h3>
+                        <p id="planListSubtitle">Choose which plan to allocate the funds to</p>
+                        <button class="back-btn" onclick="goBackToPlanTypeSelection()" style="position: absolute; top: 20px; left: 20px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px;">← Back</button>
+                    </div>
+                    <div class="auto-save-plans" id="autoSavePlansList">
+                        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                            Loading savings plans...
+                        </div>
+                    </div>
+                    <div class="auto-save-actions">
+                        <button class="auto-save-btn auto-save-btn-secondary" onclick="closeAutoSavePopup()">Cancel</button>
+                        <button class="auto-save-btn auto-save-btn-primary" id="confirmAutoSaveBtn" onclick="confirmAutoSave()" disabled>Save to Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-row">
+                <div class="left-col">
+                    <!-- Monthly Budget Snapshot -->
+                    <div class="snapshot">
+                        <div class="snapshot-content">
+                            <h2>Your Monthly Budget Snapshot</h2>
+                            <p class="snapshot-subtext"><span class="highlight">Income</span> is growing this month!</p>
+                            <div>
+                                <div class="balance" id="income-balance">₱0</div>
+                                <div class="total-label">Total Income</div>
+                            </div>
+                            <div class="snapshot-actions">
+                                <button class="month-btn" id="month-btn">September <i class="fas fa-arrow-right"></i></button>
+                                <div class="budget-info">
+                                    <span>Budget Left</span>
+                                    <span class="budget-pill" id="budget-left">₱0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Overview -->
+                    <div class="overview-card">
+                        <div class="overview-title">Financial Overview</div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total balance</div>
+                                <div class="stat-value" id="stat-total-balance">
+                                    10,867.00
+                                    <span class="change"><i class="fas fa-arrow-up"></i>5.23%</span>
+                                </div>
+                                <div class="stat-sub">Remaining funds</div>
+                                <svg class="stat-wave" viewBox="0 0 220 90" preserveAspectRatio="none">
+                                    <path d="M0 66C12 58 32 48 58 50C84 52 90 66 112 68C134 70 158 54 182 56C202 58 210 68 220 73V90H0V66Z" fill="#A9C3E1"/>
+                                    <path d="M0 78C20 66 46 60 78 64C110 68 126 82 154 84C178 86 196 78 220 70V90H0V78Z" fill="#709ACC"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Expenses</div>
+                                <div class="stat-value" id="stat-expenses">
+                                    4,663.30
+                                    <span class="change negative"><i class="fas fa-arrow-down"></i>3.15%</span>
+                                </div>
+                                <div class="stat-sub">Spent this month</div>
+                                <svg class="stat-wave" viewBox="0 0 220 90" preserveAspectRatio="none">
+                                    <path d="M0 74C16 68 32 48 58 50C84 52 98 72 126 74C154 76 178 58 202 56C212 56 218 62 220 64V90H0V74Z" fill="#6F99CD"/>
+                                    <path d="M0 86C18 78 46 70 74 74C102 78 122 88 150 90C174 91 196 82 220 74V90H0V86Z" fill="#4072AD"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Income</div>
+                                <div class="stat-value" id="stat-income">
+                                    15,867.00
+                                    <span class="change"><i class="fas fa-arrow-up"></i>7.80%</span>
+                                </div>
+                                <div class="stat-sub">Received this month</div>
+                                <svg class="stat-wave" viewBox="0 0 220 90" preserveAspectRatio="none">
+                                    <path d="M0 70C18 58 44 46 74 50C104 54 118 74 150 76C174 77 196 66 220 60V90H0V70Z" fill="#3B6CA6"/>
+                                    <path d="M0 84C24 72 54 66 84 70C114 74 134 86 164 88C188 90 206 82 220 76V90H0V84Z" fill="#21528C"/>
+                                </svg>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Savings</div>
+                                <div class="stat-value" id="stat-savings">
+                                    2,450.00
+                                    <span class="change"><i class="fas fa-arrow-up"></i>4.90%</span>
+                                </div>
+                                <div class="stat-sub">Added this month</div>
+                                <svg class="stat-wave" viewBox="0 0 220 90" preserveAspectRatio="none">
+                                    <path d="M0 76C10 70 32 50 60 52C88 54 106 74 134 76C162 78 188 64 214 60C217 59 218 60 220 61V90H0V76Z" fill="#2E5C95"/>
+                                    <path d="M0 88C20 76 46 64 74 68C102 72 118 86 148 88C176 90 198 82 220 78V90H0V88Z" fill="#0B3663"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transactions -->
+                    <div class="transactions">
+                        <div class="date-header">
+                            <span id="date-display">Sat, 10 September</span>
+                            <div class="date-header-right">
+                                <div class="date-mode">24h <i class="fas fa-sync-alt"></i></div>
+                                <button class="calendar-btn" onclick="window.location.href='MonthlyIncome.html'">
+                                    <img src="../images/calendar.png" alt="Monthly Income">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tx-labels">
+                            <span>Category</span>
+                            <span>Income</span>
+                            <span>Time</span>
+                        </div>
+                        <div id="transactions-container">
+                            <!-- Transactions loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Transaction Panel -->
+                <div class="add-panel">
+                    <h3 class="add-title">Add Transaction</h3>
+                    <div class="toggle-group">
+                        <button class="toggle-btn" onclick="window.location.href='DashboardExpenses.html'">Expenses</button>
+                        <button class="toggle-btn active">Income</button>
+                    </div>
+                    <div class="input-group">
+                        <label>Amount</label>
+                        <input type="number" id="income-amount" class="input-field" placeholder="₱" step="0.01" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Notes</label>
+                        <textarea id="income-note" class="input-field" rows="3" placeholder="Enter notes..."></textarea>
+                    </div>
+
+                    <div class="category-label">Category</div>
+                    <div class="category-grid">
+                        <button class="cat-btn" data-category="Salary" title="Salary"><i class="fas fa-briefcase"></i></button>
+                        <button class="cat-btn" data-category="Freelance" title="Freelance"><i class="fas fa-hand-holding-usd"></i></button>
+                        <button class="cat-btn" data-category="Bonus" title="Bonus"><i class="fas fa-gift"></i></button>
+                        <button class="cat-btn" data-category="Savings" title="Savings"><i class="fas fa-piggy-bank"></i></button>
+                        <button class="cat-btn" data-category="Investment" title="Investment"><i class="fas fa-chart-line"></i></button>
+                        <button class="cat-btn" data-category="Allowance" title="Allowance"><i class="fas fa-coins"></i></button>
+                        <button class="cat-btn" data-category="Business" title="Business"><i class="fas fa-wallet"></i></button>
+                        <button class="cat-btn" data-category="Other Income" title="Other Income"><i class="fas fa-money-bill-wave"></i></button>
+                        <button class="cat-btn" data-category="Other" title="Other"><i class="fas fa-ellipsis-h"></i></button>
+                    </div>
+                    <input type="hidden" id="selected-category" value="">
+
+                    <div class="calendar-section">
+                        <div class="calendar-header">
+                            <span>Select Date</span>
+                            <div class="calendar-dots">
+                                <div class="dot"></div>
+                                <div class="dot active"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid">
+                            <div class="day-name">Sun</div>
+                            <div class="day-name">Mon</div>
+                            <div class="day-name">Tue</div>
+                            <div class="day-name">Wed</div>
+                            <div class="day-name">Thu</div>
+                            <div class="day-name">Fri</div>
+                            <div class="day-name">Sat</div>
+                            <!-- Calendar days generated by JavaScript -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected-date" value="">
+
+                    <button class="save-btn" id="save-income-btn">Save Transaction</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Configuration
+        let selectedDate = new Date();
+        let selectedCategory = '';
+
+        // Category icon mapping for income
+        const categoryIcons = {
+            'Salary': 'fa-briefcase',
+            'Freelance': 'fa-hand-holding-usd',
+            'Bonus': 'fa-gift',
+            'Savings': 'fa-piggy-bank',
+            'Investment': 'fa-chart-line',
+            'Allowance': 'fa-coins',
+            'Business': 'fa-wallet',
+            'Other Income': 'fa-money-bill-wave',
+            'Other': 'fa-ellipsis-h'
+        };
+
+        // Load profile image (same as savings.html)
+        async function loadHeaderProfileImage() {
+            const headerProfileIcon = document.getElementById('headerProfileIcon');
+            if (!headerProfileIcon) return;
+            
+            const defaultImage = '../images/blankprofile.png';
+            headerProfileIcon.src = defaultImage;
+            
+            try {
+                const response = await fetch('../api/get_profile.php');
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData && userData.profileImage && 
+                        userData.profileImage.trim() !== '' && 
+                        userData.profileImage !== 'null' &&
+                        userData.profileImage.length > 0) {
+                        headerProfileIcon.src = userData.profileImage;
+                        headerProfileIcon.onerror = function() {
+                            headerProfileIcon.src = defaultImage;
+                        };
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile image:', error);
+                headerProfileIcon.src = defaultImage;
+            }
+        }
+
+        loadHeaderProfileImage();
+
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('../api/logout.php', { method: 'POST' })
+                    .then(() => window.location.href = 'login.html')
+                    .catch(() => window.location.href = 'login.html');
+            }
+        }
+
+        // Initialize calendar
+        function initCalendar() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const calendarGrid = document.getElementById('calendar-grid');
+            
+            // Clear existing days (keep day names)
+            const allChildren = Array.from(calendarGrid.children);
+            allChildren.forEach(child => {
+                if (!child.classList.contains('day-name')) {
+                    child.remove();
+                }
+            });
+            
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'day';
+                emptyDiv.style.opacity = '0.3';
+                calendarGrid.appendChild(emptyDiv);
+            }
+            
+            // Add day numbers
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.textContent = day;
+                
+                const checkDate = new Date(year, month, day);
+                if (checkDate.toDateString() === today.toDateString()) {
+                    dayDiv.classList.add('today');
+                    if (checkDate.toDateString() === selectedDate.toDateString()) {
+                        dayDiv.classList.add('selected');
+                    }
+                }
+                if (checkDate.toDateString() === selectedDate.toDateString()) {
+                    dayDiv.classList.add('selected');
+                }
+                
+                dayDiv.addEventListener('click', () => {
+                    document.querySelectorAll('.day').forEach(d => {
+                        d.classList.remove('selected');
+                        d.style.opacity = '';
+                    });
+                    dayDiv.classList.add('selected');
+                    selectedDate = new Date(year, month, day);
+                    document.getElementById('selected-date').value = formatDate(selectedDate);
+                    updateDateDisplay();
+                    loadIncome();
+                });
+                
+                calendarGrid.appendChild(dayDiv);
+            }
+            
+            // Set initial selected date
+            if (!document.getElementById('selected-date').value) {
+                document.getElementById('selected-date').value = formatDate(today);
+                selectedDate = today;
+            }
+        }
+
+        function formatDate(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function formatDateDisplay(date) {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+        }
+
+        function updateDateDisplay() {
+            const dateDisplay = document.getElementById('date-display');
+            if (dateDisplay) {
+                dateDisplay.textContent = formatDateDisplay(selectedDate);
+            }
+        }
+
+        // Category selection
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedCategory = btn.getAttribute('data-category');
+                document.getElementById('selected-category').value = selectedCategory;
+            });
+        });
+
+        // Save income
+        document.getElementById('save-income-btn').addEventListener('click', async () => {
+            const amount = document.getElementById('income-amount').value;
+            const note = document.getElementById('income-note').value;
+            const category = document.getElementById('selected-category').value;
+            const date = document.getElementById('selected-date').value || formatDate(new Date());
+
+            if (!amount || parseFloat(amount) <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            if (!category) {
+                alert('Please select a category');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('amount', amount);
+                formData.append('category', category);
+                formData.append('note', note);
+                formData.append('date', date);
+
+                const response = await fetch('../api/add_income.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Clear form
+                    document.getElementById('income-amount').value = '';
+                    document.getElementById('income-note').value = '';
+                    document.getElementById('selected-category').value = '';
+                    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+                    
+                    // Reload
+                    loadIncome();
+                    loadStats();
+                    
+                    // Check if auto-save should be triggered
+                    console.log('Income response:', data); // Debug log
+                    console.log('Auto-save data:', data.auto_save); // Debug log
+                    console.log('Amount from form:', parseFloat(amount)); // Debug log
+                    
+                    // Check auto-save with more flexible conditions
+                    const shouldTrigger = data.auto_save && 
+                                         (data.auto_save.trigger === true || data.auto_save.trigger === 'true' || data.auto_save.trigger === 1) &&
+                                         data.auto_save.amount > 0;
+                    
+                    if (shouldTrigger) {
+                        console.log('✅ Triggering auto-save popup with amount:', data.auto_save.amount);
+                        setTimeout(() => {
+                            showAutoSavePopup(parseFloat(data.auto_save.amount));
+                        }, 500); // Small delay to ensure UI is ready
+                    } else {
+                        console.log('❌ Auto-save not triggered. Reason:', {
+                            has_auto_save: !!data.auto_save,
+                            trigger: data.auto_save?.trigger,
+                            trigger_type: typeof data.auto_save?.trigger,
+                            amount: data.auto_save?.amount,
+                            amount_type: typeof data.auto_save?.amount,
+                            form_amount: parseFloat(amount)
+                        });
+                        alert('Income added successfully!');
+                    }
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to save income'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to save income. Please try again.');
+            }
+        });
+
+        // Load income transactions
+        async function loadIncome() {
+            const date = document.getElementById('selected-date') ? document.getElementById('selected-date').value : formatDate(selectedDate);
+            
+            try {
+                console.log('Loading income for date:', date);
+                const response = await fetch(`../api/get_income.php?date=${date}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Income loaded:', data);
+
+                const container = document.getElementById('transactions-container');
+                if (!container) {
+                    console.error('Transactions container not found');
+                    return;
+                }
+                
+                container.innerHTML = '';
+
+                if (data.success && data.income && data.income.length > 0) {
+                    data.income.forEach(income => {
+                        const icon = categoryIcons[income.category] || 'fa-ellipsis-h';
+                        let time = '--:--';
+                        if (income.created_at) {
+                            const dateObj = new Date(income.created_at);
+                            time = dateObj.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: false});
+                        } else if (income.date) {
+                            time = '12:00';
+                        }
+                        
+                        const txItem = document.createElement('div');
+                        txItem.className = 'tx-item';
+                        txItem.innerHTML = `
+                            <div class="tx-left">
+                                <div class="tx-icon"><i class="fas ${icon}"></i></div>
+                                <div>
+                                    <div class="tx-title">${income.category}</div>
+                                    <div class="tx-subtitle">${income.note || 'No note'}</div>
+                                </div>
+                            </div>
+                            <div class="tx-amount">+₱${parseFloat(income.amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</div>
+                            <div class="tx-time">${time}</div>
+                        `;
+                        container.appendChild(txItem);
+                    });
+                } else {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">No transactions for this date</div>';
+                }
+            } catch (error) {
+                console.error('Error loading income:', error);
+                const container = document.getElementById('transactions-container');
+                if (container) {
+                    container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--danger); font-size: 13px;">Error loading transactions. Please refresh the page.</div>';
+                }
+            }
+        }
+
+        // Load stats
+        async function loadStats() {
+            const month = selectedDate.toISOString().substring(0, 7);
+            
+            try {
+                const response = await fetch(`../api/get_dashboard_stats.php?month=${month}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    
+                    // Update snapshot balance
+                    const balanceEl = document.getElementById('income-balance');
+                    if (balanceEl) {
+                        balanceEl.textContent = `₱${stats.income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+                    }
+                    
+                    // Update budget left
+                    // Remaining budget = income - expenses - savings_from_remaining_budget
+                    const budgetPill = document.getElementById('budget-left');
+                    if (budgetPill) {
+                        const remaining = stats.remaining_budget !== undefined 
+                            ? stats.remaining_budget 
+                            : (stats.income - stats.expenses - (stats.savings_from_remaining_budget || 0));
+                        budgetPill.textContent = `₱${remaining.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+                    }
+                    
+                    // Update financial overview
+                    if (document.getElementById('stat-total-balance')) {
+                        document.getElementById('stat-total-balance').innerHTML = `${stats.total_balance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} <span class="change"><i class="fas fa-arrow-up"></i>5.23%</span>`;
+                    }
+                    if (document.getElementById('stat-expenses')) {
+                        document.getElementById('stat-expenses').innerHTML = `${stats.expenses.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} <span class="change negative"><i class="fas fa-arrow-down"></i>3.15%</span>`;
+                    }
+                    if (document.getElementById('stat-income')) {
+                        document.getElementById('stat-income').innerHTML = `${stats.income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} <span class="change"><i class="fas fa-arrow-up"></i>7.80%</span>`;
+                    }
+                    if (document.getElementById('stat-savings')) {
+                        document.getElementById('stat-savings').innerHTML = `${stats.savings.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} <span class="change"><i class="fas fa-arrow-up"></i>4.90%</span>`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Listen for savings updates from other windows/pages
+        window.addEventListener('savingsUpdated', function(e) {
+            if (e.detail && e.detail.fund_source === 'Remaining Budget') {
+                console.log('Remaining budget savings detected, reloading stats...');
+                // Reload stats to reflect the change
+                loadStats();
+            }
+        });
+
+        // Check sessionStorage for remaining budget updates on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const deduction = sessionStorage.getItem('remainingBudgetDeduction');
+            const updateTime = sessionStorage.getItem('remainingBudgetUpdateTime');
+            
+            if (deduction && updateTime) {
+                // Check if update was recent (within last 5 minutes)
+                const timeDiff = Date.now() - parseInt(updateTime);
+                if (timeDiff < 300000) { // 5 minutes
+                    console.log('Found recent remaining budget deduction, reloading stats...');
+                    loadStats();
+                    // Clear the sessionStorage after using it
+                    sessionStorage.removeItem('remainingBudgetDeduction');
+                    sessionStorage.removeItem('remainingBudgetUpdateTime');
+                }
+            }
+        });
+
+        // Update month button
+        function updateMonthButton() {
+            const monthBtn = document.getElementById('month-btn');
+            if (monthBtn) {
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+                const monthName = months[selectedDate.getMonth()];
+                monthBtn.innerHTML = `${monthName} <i class="fas fa-arrow-right"></i>`;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initCalendar();
+            updateDateDisplay();
+            updateMonthButton();
+            loadIncome();
+            loadStats();
+        });
+
+        // Auto-Save Popup Functions
+        let currentAutoSaveAmount = 0;
+        let selectedSavingsPlanId = null;
+        let selectedPlanType = null; // 'active' or 'ended'
+
+        async function showAutoSavePopup(amount) {
+            console.log('🔵 showAutoSavePopup called with amount:', amount);
+            console.log('🔵 Amount type:', typeof amount, 'Value:', amount);
+            
+            if (!amount || amount <= 0) {
+                console.error('❌ Invalid amount provided to showAutoSavePopup:', amount);
+                return;
+            }
+            
+            currentAutoSaveAmount = parseFloat(amount);
+            const amountEl = document.getElementById('autoSaveAmount');
+            const overlayEl = document.getElementById('autoSaveOverlay');
+            const planTypeSelection = document.getElementById('planTypeSelection');
+            const planListOverlay = document.getElementById('autoSavePlanListOverlay');
+            
+            console.log('🔵 Elements found:', {
+                amountEl: !!amountEl,
+                overlayEl: !!overlayEl,
+                planTypeSelection: !!planTypeSelection,
+                planListOverlay: !!planListOverlay
+            });
+            
+            if (!amountEl || !overlayEl) {
+                console.error('❌ Auto-save popup elements not found!');
+                console.error('Missing elements:', {
+                    amountEl: !amountEl,
+                    overlayEl: !overlayEl
+                });
+                alert('Error: Auto-save popup elements not found. Please refresh the page.');
+                return;
+            }
+            
+            if (!planTypeSelection) {
+                console.error('❌ planTypeSelection element not found!');
+                return;
+            }
+            
+            amountEl.textContent = `₱${currentAutoSaveAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+            selectedSavingsPlanId = null;
+            selectedPlanType = null;
+            
+            // Show step 1: Plan type selection
+            planTypeSelection.style.display = 'flex';
+            if (planListOverlay) {
+                planListOverlay.style.display = 'none';
+            }
+            
+            // Show overlay
+            overlayEl.classList.add('show');
+            console.log('✅ Auto-save popup should now be visible');
+        }
+
+        function selectPlanType(type) {
+            selectedPlanType = type;
+            
+            // Update UI to show selection
+            document.querySelectorAll('.plan-type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            // Find the clicked option and mark it as selected
+            const options = document.querySelectorAll('.plan-type-option');
+            options.forEach(opt => {
+                if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes(`'${type}'`)) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            // Show plan list after short delay
+            setTimeout(() => {
+                showPlanList(type);
+            }, 300);
+        }
+
+        function goBackToPlanTypeSelection() {
+            document.getElementById('autoSavePlanListOverlay').style.display = 'none';
+            document.getElementById('autoSavePlanListOverlay').classList.remove('show');
+            document.getElementById('autoSaveOverlay').classList.add('show');
+            selectedPlanType = null;
+            selectedSavingsPlanId = null;
+            // Reset plan type selection visual state
+            document.querySelectorAll('.plan-type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+
+        async function showPlanList(type) {
+            // Hide step 1, show step 2
+            document.getElementById('autoSaveOverlay').classList.remove('show');
+            const planListOverlay = document.getElementById('autoSavePlanListOverlay');
+            planListOverlay.style.display = 'flex';
+            planListOverlay.classList.add('show');
+            
+            // Update title based on type
+            const titleEl = document.getElementById('planListTitle');
+            const subtitleEl = document.getElementById('planListSubtitle');
+            
+            if (type === 'active') {
+                titleEl.textContent = 'Select Active Plan';
+                subtitleEl.textContent = 'Choose an active savings plan to allocate funds to';
+            } else {
+                titleEl.textContent = 'Select Ended Plan to Reactivate';
+                subtitleEl.textContent = 'This plan will be reactivated. You may want to update its end date.';
+            }
+            
+            // Load plans based on type
+            await loadAutoSavePlans(type);
+        }
+
+        function closeAutoSavePopup() {
+            // Only allow closing from the plan selection step (step 2), not from plan type selection (step 1)
+            // This ensures users must make a choice
+            document.getElementById('autoSaveOverlay').classList.remove('show');
+            document.getElementById('autoSavePlanListOverlay').classList.remove('show');
+            document.getElementById('autoSavePlanListOverlay').style.display = 'none';
+            selectedSavingsPlanId = null;
+            selectedPlanType = null;
+            currentAutoSaveAmount = 0;
+            // Reset plan type selection visual state
+            document.querySelectorAll('.plan-type-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+
+        async function loadAutoSavePlans(type = 'active') {
+            const plansList = document.getElementById('autoSavePlansList');
+            if (!plansList) {
+                console.error('autoSavePlansList element not found!');
+                return;
+            }
+            
+            plansList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">Loading savings plans...</div>';
+            
+            try {
+                // Fetch plans based on type
+                const endpoint = type === 'active' 
+                    ? '../api/get_active_savings_plans.php'
+                    : '../api/get_ended_savings_plans.php';
+                
+                const response = await fetch(endpoint);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch savings plans: ' + response.status);
+                }
+                const data = await response.json();
+                console.log('Savings plans response:', data);
+                
+                if (data.success && data.plans && data.plans.length > 0) {
+                    plansList.innerHTML = data.plans.map(plan => {
+                        const progress = plan.goal_amount > 0 ? Math.round((plan.saved_amount / plan.goal_amount) * 100) : 0;
+                        const statusBadge = type === 'ended' ? '<div style="font-size: 11px; color: var(--danger); margin-top: 4px; font-weight: 500;"><i class="fas fa-exclamation-circle"></i> Ended Plan</div>' : '';
+                        return `
+                            <div class="auto-save-plan-item" onclick="selectAutoSavePlan('${plan.savings_id}')" data-plan-id="${plan.savings_id}">
+                                <div class="auto-save-plan-name">${plan.plan_name}</div>
+                                <div class="auto-save-plan-progress">₱${plan.saved_amount.toLocaleString('en-PH')} / ₱${plan.goal_amount.toLocaleString('en-PH')} (${progress}%)</div>
+                                ${statusBadge}
+                            </div>
+                        `;
+                    }).join('');
+                    // Enable confirm button if plans are available
+                    const confirmBtn = document.getElementById('confirmAutoSaveBtn');
+                    if (confirmBtn) {
+                        confirmBtn.disabled = false;
+                    }
+                } else {
+                    // If no ended plans, automatically switch to active plans
+                    if (type === 'ended') {
+                        // Update UI to show we're switching to active plans
+                        const titleEl = document.getElementById('planListTitle');
+                        const subtitleEl = document.getElementById('planListSubtitle');
+                        if (titleEl) titleEl.textContent = 'Select Active Plan';
+                        if (subtitleEl) subtitleEl.textContent = 'No ended plans. Choose an active savings plan to allocate funds to';
+                        
+                        // Update selected plan type to 'active'
+                        selectedPlanType = 'active';
+                        
+                        // Load active plans instead
+                        await loadAutoSavePlans('active');
+                        return;
+                    } else {
+                        // No active plans either
+                        const message = 'No active savings plans found. Create one first!';
+                        plansList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">${message}</div>`;
+                        // Disable confirm button if no plans available
+                        const confirmBtn = document.getElementById('confirmAutoSaveBtn');
+                        if (confirmBtn) {
+                            confirmBtn.disabled = true;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading plans:', error);
+                plansList.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--danger);">Error loading savings plans. Please try again.</div>';
+                const confirmBtn = document.getElementById('confirmAutoSaveBtn');
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                }
+            }
+        }
+
+        function selectAutoSavePlan(savingsId) {
+            // Remove previous selection
+            document.querySelectorAll('.auto-save-plan-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            const selectedItem = document.querySelector(`[data-plan-id="${savingsId}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+                selectedSavingsPlanId = savingsId;
+                const confirmBtn = document.getElementById('confirmAutoSaveBtn');
+                if (confirmBtn) {
+                    confirmBtn.disabled = false;
+                    // Update button text based on plan type
+                    if (selectedPlanType === 'ended') {
+                        confirmBtn.textContent = 'Reactivate & Save';
+                    } else {
+                        confirmBtn.textContent = 'Save to Plan';
+                    }
+                }
+            }
+        }
+
+        async function confirmAutoSave() {
+            if (!selectedSavingsPlanId || currentAutoSaveAmount <= 0) {
+                alert('Please select a savings plan');
+                return;
+            }
+
+            const confirmBtn = document.getElementById('confirmAutoSaveBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Saving...';
+
+            try {
+                const formData = new FormData();
+                formData.append('savings_id', selectedSavingsPlanId);
+                formData.append('amount', currentAutoSaveAmount);
+                formData.append('fund_source', 'Auto-Save from Income');
+                formData.append('reactivate_plan', selectedPlanType === 'ended' ? 'true' : 'false');
+
+                const response = await fetch('../api/auto_save_income.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let message = 'Auto-save successful! ₱' + currentAutoSaveAmount.toFixed(2) + ' has been added to your savings plan.';
+                    if (selectedPlanType === 'ended' && (data.reactivated || data.plan_reactivated)) {
+                        message += '\n\nThe plan has been reactivated and is now active. You may want to update its end date in the savings page.';
+                    }
+                    alert(message);
+                    closeAutoSavePopup();
+                    // Reload stats to reflect the change
+                    loadStats();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to save'));
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = selectedPlanType === 'ended' ? 'Reactivate & Save' : 'Save to Plan';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to save. Please try again.');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = selectedPlanType === 'ended' ? 'Reactivate & Save' : 'Save to Plan';
+            }
+        }
+
+        // Close popup when clicking overlay
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('autoSaveOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeAutoSavePopup();
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="../js/notification-system.js"></script>
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>

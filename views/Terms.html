@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spendy – Terms & Conditions</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #f5f7fb;
+        color: #071538;
+        line-height: 1.6;
+        animation: fadeIn 0.15s ease-in;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .page-wrapper {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 60px 24px 80px;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      header h1 {
+        font-size: 32px;
+        font-weight: 600;
+        color: #0b1b3d;
+      }
+      header p {
+        margin-top: 8px;
+        color: #6a7594;
+      }
+      section + section {
+        margin-top: 32px;
+      }
+      h2 {
+        font-size: 20px;
+        margin-bottom: 12px;
+        color: #0b2f78;
+      }
+      p {
+        margin-bottom: 12px;
+      }
+      ul {
+        margin-left: 20px;
+        color: #333f63;
+      }
+      footer {
+        margin-top: 48px;
+        font-size: 14px;
+        color: #7b87a5;
+        text-align: center;
+      }
+      a {
+        color: #0b2f78;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-wrapper">
+      <header>
+        <h1>Terms & Conditions</h1>
+        <p>Last updated: November 28, 2025</p>
+      </header>
+
+      <section>
+        <h2>1. Acceptance of Terms</h2>
+        <p>
+          By creating a Spendy account or using our services, you agree to follow
+          these Terms & Conditions. If you do not agree, please discontinue using
+          the application immediately.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Use of the Service</h2>
+        <ul>
+          <li>Provide accurate and current information during sign up.</li>
+          <li>Use Spendy for lawful personal budgeting purposes only.</li>
+          <li>
+            Do not attempt to access, tamper with, or use non‑public areas of the
+            platform or its infrastructure.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Privacy</h2>
+        <p>
+          Your data is handled according to our Privacy Policy. We only use the
+          information you provide to deliver and improve the Spendy experience.
+          Contact us at <a href="mailto:support@spendy.app">support@spendy.app</a>
+          with any privacy questions.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Account & Security</h2>
+        <p>
+          You are responsible for maintaining the confidentiality of your login
+          credentials and for all activities under your account. Notify us
+          immediately if you suspect unauthorized access.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Updates to These Terms</h2>
+        <p>
+          We may update these Terms from time to time. We will notify you of
+          material changes, and continuing to use Spendy after updates means you
+          accept the revised Terms.
+        </p>
+      </section>
+
+      <footer>
+        © <span id="year"></span> Spendy. All rights reserved.
+      </footer>
+    </main>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script src="../js/smooth-transitions.js"></script>
+  </body>
+</html>
+

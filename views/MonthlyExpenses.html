@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Expenses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root {
+            --navy: #01143D;
+            --bg: #E8ECEF;
+            --card: #FFFFFF;
+            --text-dark: #1E2A39;
+            --text-muted: #A9AEB4;
+            --progress: #4AB3FF;
+            --progress-bg: #D7DDE4;
+            --danger: #E53535;
+            --success: #1DAA6F;
+            --cyan: #43B3EF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Exact copy from savings.html */
+        .sidebar {
+            width: 100px;
+            background: var(--navy);
+            margin: 20px 10px 20px 20px;
+            border-top-right-radius: 28px;
+            border-top-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            border-bottom-left-radius: 28px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .sidebar img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .sidebar .logo {
+            margin-top: -15px;
+            width: 95px;
+            height: 95px;
+        }
+
+        .nav-icon {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .nav-icon .hover-arch {
+            position: absolute;
+            width: 110px;
+            height: 120px;
+            margin-left: 33px;
+            object-fit: contain;
+        }
+
+        .nav-icon .active-icon {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Main content area */
+        .main {
+            flex: 1;
+            padding: 24px 48px 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .top-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-icons img {
+            width: 50px;
+            height: 50px;
+            border-radius: 24px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* Notification System */
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-icon-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .notification-icon-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid var(--card);
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .notification-badge.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 380px;
+            max-height: 500px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+
+        .notification-dropdown.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .notification-header button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .notification-header button:hover {
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notification-item:hover {
+            background: var(--bg);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon-large {
+            font-size: 24px;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .notification-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Main card container */
+        .expenses-card {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            flex: 1;
+            display: flex;
+            gap: 60px;
+            overflow: hidden;
+        }
+
+        .expenses-left {
+            flex: 1.4;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .month-nav {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .month-nav i {
+            color: var(--cyan);
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .month-nav i:hover {
+            transform: translateX(-3px);
+        }
+
+        .back-to-dashboard {
+            margin-right: 12px;
+        }
+
+        .month-navigation {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .month-navigation i {
+            color: var(--cyan);
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .month-navigation i.fa-chevron-left:hover {
+            transform: translateX(-3px);
+        }
+
+        .month-navigation i.fa-chevron-right:hover {
+            transform: translateX(3px);
+        }
+
+        /* Bar Chart Container */
+        .chart-container {
+            position: relative;
+            height: 320px;
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .bars {
+            position: absolute;
+            bottom: 50px;
+            left: 50px;
+            right: 50px;
+            height: 240px;
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            gap: 8px;
+        }
+
+        .bar {
+            position: relative;
+            border-radius: 30px 30px 0 0;
+            flex: 1;
+            min-width: 40px;
+            max-width: 80px;
+            transition: opacity 0.2s;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+        }
+
+        .bar span {
+            position: absolute;
+            top: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--navy);
+            white-space: nowrap;
+        }
+
+        /* X-Axis Labels */
+        .x-axis {
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+            right: 50px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            pointer-events: none;
+            gap: 8px;
+        }
+
+        .x-axis span {
+            flex: 1;
+            min-width: 40px;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Category List */
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .cat-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .cat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .cat-name {
+            font-size: 19px;
+            font-weight: 600;
+        }
+
+        .cat-percent {
+            font-size: 16px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .cat-amount {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        /* Calendar Section */
+        .expenses-right {
+            flex: 1;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .days-of-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .dow {
+            background: var(--navy);
+            color: white;
+            padding: 10px 0;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            font-size: 15px;
+            color: var(--navy);
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .cal-day:hover:not(.today):not([style*="opacity"]) {
+            background: #f0f0f0;
+        }
+
+        .cal-day.today {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .cal-day[style*="opacity"] {
+            cursor: default;
+        }
+
+        .week-separator {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: #eee;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <a href="DashboardExpenses.html" style="text-decoration: none;">
+                <img src="../images/spendylogo.png" alt="Spendy logo" class="logo">
+            </a>
+            <div class="nav-icon" onclick="window.location.href='DashboardExpenses.html'" style="cursor: pointer;">
+                <img src="../images/dashboardicon.png" alt="Dashboard">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='savings.html'" style="cursor: pointer;">
+                <img src="../images/dashboardsavingsicon.png" alt="Savings">
+            </div>
+            <div class="nav-icon" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+                <img src="../images/Windows 10 Settings - iconSvg.co.png" alt="Settings">
+            </div>
+            <div class="nav-icon" style="margin-top:auto; cursor: pointer;" onclick="handleLogout()">
+                <img src="../images/logouticon.png" alt="Logout">
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="page-header">
+                <h1 class="page-title">Monthly Expenses</h1>
+                <div class="top-icons">
+                    <div class="notification-wrapper">
+                        <div class="notification-icon-wrapper" onclick="toggleNotifications()">
+                            <img src="../images/notificon.png" alt="Notifications" id="notificationIcon">
+                            <span class="notification-badge" id="notificationBadge"></span>
+                        </div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button onclick="loadNotifications()">Refresh</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon" onclick="window.location.href='profile.html'" style="cursor: pointer;" onerror="this.src='../images/blankprofile.png'">
+                </div>
+            </header>
+
+
+            <div class="expenses-card">
+                <div class="expenses-left">
+                    <div class="month-nav">
+                        <i class="fas fa-chevron-left back-to-dashboard" id="back-to-dashboard" onclick="window.location.href='DashboardExpenses.html'" title="Back to Dashboard"></i>
+                        <div class="month-navigation">
+                            <i class="fas fa-chevron-left" id="prev-month" onclick="changeMonth(-1)" title="Previous Month"></i>
+                            <span id="month-display">September 2025</span>
+                            <i class="fas fa-chevron-right" id="next-month" onclick="changeMonth(1)" title="Next Month"></i>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="bars" id="bars-container">
+                            <!-- Bars generated dynamically -->
+                        </div>
+                        <div class="x-axis" id="x-axis-container">
+                            <!-- X-axis labels generated dynamically -->
+                        </div>
+                    </div>
+
+                    <div id="categories-container" style="flex: 1; overflow-y: auto; padding-right: 10px;">
+                        <!-- Category items generated dynamically -->
+                    </div>
+                </div>
+
+                <div class="expenses-right">
+                    <div style="height: 70px;"></div>
+
+                    <div class="days-of-week">
+                        <div class="dow">SUN</div>
+                        <div class="dow">MON</div>
+                        <div class="dow">TUE</div>
+                        <div class="dow">WED</div>
+                        <div class="dow">THU</div>
+                        <div class="dow">FRI</div>
+                        <div class="dow">SAT</div>
+                    </div>
+
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Calendar generated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentMonth = new Date();
+        
+        // Category icon and color mapping
+        const categoryConfig = {
+            'Food': { icon: 'fa-hamburger', color: '#E0BBE4', class: 'cat-food' },
+            'Traffic': { icon: 'fa-car', color: '#A0D8EF', class: 'cat-traffic' },
+            'Home': { icon: 'fa-home', color: '#B2DFDB', class: 'cat-home' },
+            'Health': { icon: 'fa-heart', color: '#FFB6C1', class: 'cat-health' },
+            'Shopping': { icon: 'fa-shopping-bag', color: '#B5EAD7', class: 'cat-shopping' },
+            'Groceries': { icon: 'fa-shopping-cart', color: '#FFD4B2', class: 'cat-groceries' },
+            'Dining': { icon: 'fa-utensils', color: '#FDFD96', class: 'cat-dining' },
+            'Gifts': { icon: 'fa-gift', color: '#FFD4B2', class: 'cat-gifts' },
+            'Rent': { icon: 'fa-building', color: '#C7CEEA', class: 'cat-rent' },
+            'Recurring': { icon: 'fa-sync-alt', color: '#D3D3D3', class: 'cat-recurring' },
+            'Entertainment': { icon: 'fa-gamepad', color: '#FFE29A', class: 'cat-entertainment' },
+            'Other': { icon: 'fa-ellipsis-h', color: '#D3D3D3', class: 'cat-other' }
+        };
+
+        // Load profile image (same as savings.html)
+        async function loadHeaderProfileImage() {
+            const headerProfileIcon = document.getElementById('headerProfileIcon');
+            if (!headerProfileIcon) return;
+            
+            const defaultImage = '../images/blankprofile.png';
+            // Check if it's an img tag or div with background-image
+            if (headerProfileIcon.tagName === 'IMG') {
+                headerProfileIcon.src = defaultImage;
+                headerProfileIcon.onerror = function() {
+                    this.src = defaultImage;
+                };
+            } else {
+                headerProfileIcon.style.backgroundImage = `url('${defaultImage}')`;
+            }
+            
+            try {
+                const response = await fetch('../api/get_profile.php');
+                if (response.ok) {
+                    const userData = await response.json();
+                    if (userData && userData.profileImage && 
+                        userData.profileImage.trim() !== '' && 
+                        userData.profileImage !== 'null' &&
+                        userData.profileImage.length > 0) {
+                        if (headerProfileIcon.tagName === 'IMG') {
+                            headerProfileIcon.src = userData.profileImage;
+                            headerProfileIcon.onerror = function() {
+                                this.src = defaultImage;
+                            };
+                        } else {
+                            headerProfileIcon.style.backgroundImage = `url('${userData.profileImage}')`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile image:', error);
+                if (headerProfileIcon.tagName === 'IMG') {
+                    headerProfileIcon.src = defaultImage;
+                } else {
+                    headerProfileIcon.style.backgroundImage = `url('${defaultImage}')`;
+                }
+            }
+        }
+
+        // Logout function
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                fetch('../api/logout.php', { method: 'POST' })
+                    .then(() => window.location.href = 'login.html')
+                    .catch(() => window.location.href = 'login.html');
+            }
+        }
+
+        // Format month for display
+        function formatMonthDisplay(date) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        // Format month for API (YYYY-MM)
+        function formatMonth(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}`;
+        }
+
+        // Update month display
+        function updateMonthDisplay() {
+            const monthEl = document.getElementById('month-display');
+            if (monthEl) {
+                monthEl.textContent = formatMonthDisplay(currentMonth);
+            }
+        }
+
+        // Generate calendar
+        function generateCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            
+            const calendarGrid = document.getElementById('calendar-grid');
+            calendarGrid.innerHTML = '';
+            
+            // Get previous month's last days
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'cal-day';
+                dayDiv.textContent = prevMonthDays - i;
+                dayDiv.style.opacity = '0.3';
+                calendarGrid.appendChild(dayDiv);
+            }
+            
+            // Current month days
+            let weekCount = 0;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'cal-day';
+                const checkDate = new Date(year, month, day);
+                
+                if (checkDate.toDateString() === today.toDateString()) {
+                    dayDiv.classList.add('today');
+                }
+                
+                dayDiv.textContent = day;
+                calendarGrid.appendChild(dayDiv);
+                
+                // Add week separator after Saturday (every 7 days)
+                if ((firstDay + day) % 7 === 0 && day < daysInMonth) {
+                    weekCount++;
+                    if (weekCount < 5) {
+                        const separator = document.createElement('div');
+                        separator.className = 'week-separator';
+                        calendarGrid.appendChild(separator);
+                    }
+                }
+            }
+            
+            // Fill remaining days of last week
+            const remainingDays = 7 - ((firstDay + daysInMonth) % 7);
+            if (remainingDays < 7) {
+                for (let day = 1; day <= remainingDays; day++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'cal-day';
+                    dayDiv.textContent = day;
+                    dayDiv.style.opacity = '0.3';
+                    calendarGrid.appendChild(dayDiv);
+                }
+            }
+        }
+
+        // Generate bar chart showing category percentages
+        function generateBarChart(categories) {
+            const barsContainer = document.getElementById('bars-container');
+            const xAxisContainer = document.getElementById('x-axis-container');
+            barsContainer.innerHTML = '';
+            xAxisContainer.innerHTML = '';
+            
+            if (!categories || categories.length === 0) {
+                barsContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #888; width: 100%;">No expenses for this month</div>';
+                return;
+            }
+            
+            const maxHeight = 240; // Maximum bar height in pixels
+            const maxPercentage = Math.max(...categories.map(c => c.percentage));
+            
+            // Generate bars for each category
+            categories.forEach((cat) => {
+                const config = categoryConfig[cat.category] || { icon: 'fa-ellipsis-h', color: '#D3D3D3', class: 'cat-other' };
+                const height = maxPercentage > 0 ? (cat.percentage / maxPercentage) * maxHeight : 0;
+                
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${Math.max(height, 20)}px`; // Minimum height for visibility
+                bar.style.background = config.color;
+                bar.innerHTML = `<span>${cat.percentage.toFixed(1)}%</span>`;
+                barsContainer.appendChild(bar);
+                
+                // Add category name to x-axis
+                const label = document.createElement('span');
+                label.textContent = cat.category.length > 8 ? cat.category.substring(0, 7) + '...' : cat.category;
+                label.title = cat.category; // Full name on hover
+                xAxisContainer.appendChild(label);
+            });
+        }
+
+        // Generate category list
+        function generateCategoryList(categories) {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+            
+            if (!categories || categories.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #888;">No expenses for this month</div>';
+                return;
+            }
+            
+            categories.forEach(cat => {
+                const config = categoryConfig[cat.category] || { icon: 'fa-ellipsis-h', color: '#D3D3D3', class: 'cat-other' };
+                
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.innerHTML = `
+                    <div class="cat-left">
+                        <div class="cat-icon ${config.class}" style="background: ${config.color};">
+                            <i class="fas ${config.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="cat-name">${cat.category}</div>
+                            <div class="cat-percent">${cat.percentage.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    <div class="cat-amount">₱${cat.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Format date for display
+        function formatDateDisplay(date) {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+
+        // Update current date display
+        function updateCurrentDate() {
+            const dateEl = document.getElementById('current-date');
+            if (dateEl) {
+                dateEl.textContent = formatDateDisplay(new Date());
+            }
+        }
+
+        // Change month navigation
+        function changeMonth(direction) {
+            currentMonth.setMonth(currentMonth.getMonth() + direction);
+            updateMonthDisplay();
+            generateCalendar();
+            loadMonthlyExpenses();
+        }
+
+        // Load monthly expenses data
+        async function loadMonthlyExpenses() {
+            const month = formatMonth(currentMonth);
+            
+            try {
+                const response = await fetch(`../api/get_monthly_expenses.php?month=${month}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Generate bar chart showing category percentages
+                    generateBarChart(data.categories || []);
+                    
+                    // Generate category list
+                    generateCategoryList(data.categories || []);
+                } else {
+                    console.error('API returned error:', data.message || 'Unknown error');
+                    // Show empty state
+                    const barsContainer = document.getElementById('bars-container');
+                    if (barsContainer) {
+                        barsContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #888; width: 100%;">Failed to load expenses data</div>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading monthly expenses:', error);
+                // Show error state
+                const barsContainer = document.getElementById('bars-container');
+                if (barsContainer) {
+                    barsContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #888; width: 100%;">Error loading expenses. Please try again.</div>';
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCurrentDate();
+            updateMonthDisplay();
+            generateCalendar();
+            loadMonthlyExpenses();
+            loadHeaderProfileImage();
+        });
+    </script>
+    <script src="../js/notification-system.js"></script>
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>

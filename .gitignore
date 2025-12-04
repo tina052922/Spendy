@@ -1,0 +1,42 @@
+# XAMPP / PHP
+*.log
+php_errors.log
+error_log
+*.log.*
+
+# Database
+*.sql.bak
+*.sql~
+*.db
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+config.local.php
+*.local.php
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.cache/
+
+# Image placeholders (remove when adding real images)
+images/wireframes/
+images/screenshots/
+images/user_flows/
+images/interactive/
+images/er_diagram_placeholder.png
+

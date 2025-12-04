@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #01143D;
+            --bg: #E8ECEF;
+            --card: #FFFFFF;
+            --text-dark: #1E2A39;
+            --text-muted: #A9AEB4;
+            --progress: #4AB3FF;
+            --progress-bg: #D7DDE4;
+            --danger: #E53535;
+            --success: #1DAA6F;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 100px;
+            background: var(--navy);
+            margin: 20px 10px 20px 20px;
+            border-top-right-radius: 28px;
+            border-top-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            border-bottom-left-radius: 28px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .sidebar img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .sidebar .logo {
+            margin-top:-15px;
+            width: 95px;
+            height: 95px;
+        }
+
+        .nav-icon {
+            position: relative;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icon .hover-arch {
+            position: absolute;
+            width: 110px;
+            height: 120px;
+            margin-left: 33px;
+            object-fit: contain;
+        }
+
+        .nav-icon .active-icon {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main {
+            flex: 1;
+            padding: 24px 48px 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .page-title {
+            font-size: 42px;
+            font-weight: 700;
+        }
+
+        .top-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-icons img {
+            width: 50px;
+            height: 50px;
+            border-radius: 24px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        /* Notification System */
+        .notification-wrapper {
+            position: relative;
+        }
+
+        .notification-icon-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .notification-icon-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid var(--card);
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .notification-badge.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 380px;
+            max-height: 500px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+
+        .notification-dropdown.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .notification-header button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .notification-header button:hover {
+            background: var(--bg);
+            color: var(--text-dark);
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notification-item:hover {
+            background: var(--bg);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-icon-large {
+            font-size: 24px;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .notification-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-right: -8px;
+        }
+
+        .content-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 999px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 380px;
+            gap: 20px;
+        }
+
+        .main-card {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 32px;
+            box-shadow: 0 12px 24px rgba(8, 26, 81, 0.08);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(167, 167, 167, 0.5);
+            margin-bottom: 24px;
+        }
+
+        .profile-image-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        #profileImage {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .upload-photo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid rgba(2, 34, 104, 0.6);
+            border-radius: 24px;
+            background: var(--card);
+            cursor: pointer;
+            font-size: 14px;
+            color: rgba(1, 20, 61, 0.8);
+            transition: background 0.2s;
+        }
+
+        .upload-photo-btn:hover {
+            background: var(--bg);
+        }
+
+        .upload-photo-btn input[type="file"] {
+            display: none;
+        }
+
+        .upload-photo-btn .camera-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--navy);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        #profileName {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-top: 12px;
+        }
+
+        .personal-info-card {
+            background: var(--card);
+            border: 1px solid rgba(2, 34, 104, 0.6);
+            border-radius: 25px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .edit-btn {
+            background: var(--card);
+            border: 1px solid rgba(2, 34, 104, 0.6);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #022268;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        #cancelAddressBtn {
+    display: none;
+}
+
+#saveAddressBtn {
+    display: none;
+}
+
+        .edit-btn:hover {
+            background: var(--bg);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px 32px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: rgba(2, 34, 104, 0.7);
+            font-weight: 400;
+        }
+
+        .info-display {
+            font-size: 16px;
+            color: #022268;
+            font-weight: 500;
+        }
+
+        .info-edit {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid rgba(2, 34, 104, 0.6);
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            color: #022268;
+            display: none;
+        }
+
+        .info-edit:focus {
+            outline: none;
+            border-color: var(--progress);
+        }
+
+        /* Dropdown styling - consistent with signup.html */
+        select.info-edit {
+            appearance: none;
+            background-color: #f7f9fd;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23617299' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 12px;
+            padding-right: 40px;
+            cursor: pointer;
+            border: 1px solid #d7e0ef;
+        }
+
+        select.info-edit:focus {
+            border-color: var(--progress);
+            outline: none;
+        }
+
+        .info-actions {
+            display: none;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .info-actions.show {
+            display: flex;
+        }
+
+        .cancel-btn, .save-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .cancel-btn {
+            border: 1px solid rgba(2, 34, 104, 0.6);
+            background: var(--card);
+            color: #022268;
+        }
+
+        .save-btn {
+            background: var(--progress);
+            color: white;
+            border: none;
+        }
+
+        .save-btn:hover, .cancel-btn:hover {
+            opacity: 0.9;
+        }
+
+        .address-card {
+            background: var(--bg);
+            border: 1px solid rgba(2, 34, 104, 0.6);
+            border-radius: 25px;
+            padding: 24px;
+        }
+
+        .address-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .address-input {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid var(--progress);
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #022268;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .address-input input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 500;
+            color: #022268;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .address-display {
+            display: none;
+        }
+
+        .save-changes-btn {
+            background: var(--progress);
+            border-radius: 20px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+
+        .save-changes-btn:hover {
+            opacity: 0.9;
+        }
+
+        .completion-card {
+            background: var(--card);
+            border-radius: 30px;
+            padding: 32px;
+            box-shadow: 0 12px 24px rgba(8, 26, 81, 0.08);
+            height: fit-content;
+        }
+
+        .completion-title {
+            margin-left: 50px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 32px;
+        }
+
+        .progress-circle-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    height: 180px;
+    padding: 15px;
+}
+
+.progress-circle {
+    width: 150px;
+    height: 150px;
+    transform: rotate(-90deg);
+    overflow: visible;
+}
+
+        .progress-circle-bg {
+            fill: none;
+            stroke: #D9D9D9;
+            stroke-width: 20;
+        }
+
+        .progress-circle-fill {
+            fill: none;
+            stroke: #022268;
+            stroke-width: 20;
+            stroke-linecap: round;
+            stroke-dasharray: 439.8;
+            stroke-dashoffset: 219.9;
+            transition: stroke-dashoffset 0.3s;
+        }
+
+        .progress-percentage {
+            position: absolute;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .completion-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .completion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #022268;
+        }
+
+        .completion-item .check {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .completion-item .check.complete {
+            color: var(--progress);
+            font-weight: 700;
+        }
+
+        .completion-item .check.incomplete {
+            color: #D9D9D9;
+        }
+
+        .notification-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .notification-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification-toast.success {
+            background: var(--success);
+        }
+
+        .notification-toast.error {
+            background: var(--danger);
+        }
+
+        .notification-toast.info {
+            background: var(--progress);
+        }
+
+        @media (max-width: 1200px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .completion-card {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <img src="../images/spendylogo.png" alt="Spendy logo" class="logo">
+            <div class="nav-icon">
+                <a href="DashboardExpenses.html" style="display: flex; align-items: center; justify-content: center;">
+                    <img src="../images/dashboardicon.png" alt="Dashboard">
+                </a>
+            </div>
+            <div class="nav-icon">
+                <a href="savings.html" style="display: flex; align-items: center; justify-content: center;">
+                    <img src="../images/savingsprofileicon.png" alt="Savings">
+                </a>
+            </div>
+            <div class="nav-icon" onclick="if(typeof smoothPageTransition==='function'){smoothPageTransition('settings.html');}else{window.location.href='settings.html';}" style="cursor: pointer;">
+                <img src="../images/Windows 10 Settings - iconSvg.co.png" alt="Settings" class="active-icon">
+            </div>
+            <div class="nav-icon" style="margin-top:auto; cursor: pointer;" onclick="handleLogout()">
+                <img src="../images/logouticon.png" alt="Logout">
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="page-header">
+                <h1 class="page-title">Profile</h1>
+                
+                <div class="top-icons">
+                    <div class="notification-wrapper">
+                        <div class="notification-icon-wrapper" onclick="toggleNotifications()">
+                            <img src="../images/notificon.png" alt="Notifications" id="notificationIcon">
+                            <span class="notification-badge" id="notificationBadge"></span>
+                        </div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifications</h3>
+                                <button onclick="loadNotifications()">Refresh</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon">
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div class="profile-grid">
+                    <div class="main-card">
+                        <div class="profile-header">
+                            <div class="profile-image-wrapper">
+                                <img id="profileImage" src="../images/blankprofile.png" alt="Profile">
+                            </div>
+                            <div style="flex: 1;">
+                                <label class="upload-photo-btn">
+                                    <input type="file" id="photoUpload" accept="image/*">
+                                    <div class="camera-icon"><img src="../images/uploadphotoicon.png" alt="Upload Photo Icon" style="width: 24px; height: 24px;"></div>
+                                    <span>Upload photo</span>
+                                </label>
+                                <h2 id="profileName" class="mt-3">Vilia Crestene</h2>
+                            </div>
+                        </div>
+
+                        <div class="personal-info-card">
+                            <div class="section-header">
+                                <h3 class="section-title">Personal Info</h3>
+                                <button id="editPersonalInfoBtn" class="edit-btn">
+                                    <img id="editPersonalInfoIcon" src="../images/editicon.png" alt="Edit Icon" style="width: 14px; height: 16px; margin-right: 4px; display: inline-block;">
+                                    <span id="editPersonalInfoText">Edit</span>
+                                </button>
+                            </div>
+
+                            <div id="personalInfoGrid" class="info-grid">
+                                <div class="info-item">
+                                    <p class="info-label">Full Name</p>
+                                    <p id="fullNameDisplay" class="info-display">Vilia Crestene</p>
+                                    <input type="text" id="fullNameInput" class="info-edit" value="Vilia Crestene">
+                                </div>
+                                <div class="info-item">
+                                    <p class="info-label">Email</p>
+                                    <p id="emailDisplay" class="info-display">viliagelaga@gmail.com</p>
+                                    <input type="email" id="emailInput" class="info-edit" value="viliagelaga@gmail.com">
+                                </div>
+                                <div class="info-item">
+                                    <p class="info-label">Phone</p>
+                                    <p id="phoneDisplay" class="info-display">+63 997 6430394</p>
+                                    <input type="tel" id="phoneInput" class="info-edit" value="+63 997 6430394">
+                                </div>
+                                <div class="info-item">
+                                    <p class="info-label">Birthday</p>
+                                    <p id="birthdayDisplay" class="info-display">February 21, 2005</p>
+                                    <input type="date" id="birthdayInput" class="info-edit" value="2005-02-21">
+                                </div>
+                                <div class="info-item">
+                                    <p class="info-label">Gender</p>
+                                    <p id="genderDisplay" class="info-display">Female</p>
+                                    <select id="genderInput" class="info-edit">
+                                        <option value="Female" selected>Female</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Prefer not to say">Prefer not to say</option>
+                                    </select>
+                                </div>
+                                <div class="info-item">
+                                    <p class="info-label">Nationality</p>
+                                    <p id="nationalityDisplay" class="info-display">Filipino</p>
+                                    <select id="nationalityInput" class="info-edit">
+                                        <option value="Filipino" selected>Filipino</option>
+                                        <option value="American">American</option>
+                                        <option value="Canadian">Canadian</option>
+                                        <option value="Australian">Australian</option>
+                                        <option value="British">British</option>
+                                        <option value="Singaporean">Singaporean</option>
+                                        <option value="Japanese">Japanese</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="personalInfoActions" class="info-actions">
+                                <button id="savePersonalInfoBtn" class="save-btn">Save</button>
+                            </div>
+                        </div>
+
+                        <div class="address-card">
+                            <div class="section-header">
+                                <h3 class="section-title">Address</h3>
+                                <button id="editAddressBtn" class="edit-btn">
+                                    <img id="editAddressIcon" src="../images/editicon.png" alt="Edit Icon" style="width: 14px; height: 16px; margin-right: 4px; display: inline-block;">
+                                    <span id="editAddressText">Edit</span>
+                                </button>
+                            </div>
+
+                            <div class="address-input-wrapper">
+                                <div class="address-input">
+                                    <img src="../images/locpinicon.png" alt="Location Pin Icon" style="width: 16px; height: 16px; margin-right: 4px;">
+                                    <span id="addressDisplay" class="address-display">Dr.T.S. Kintanar St. Canbanua, Argao, Cebu</span>
+                                    <input type="text" id="addressInput" value="Dr.T.S. Kintanar St. Canbanua, Argao, Cebu">
+                                </div>
+                                <button id="saveAddressBtn" class="save-changes-btn">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="completion-card">
+                        <h3 class="completion-title">Complete your profile</h3>
+                        
+                        <div class="progress-circle-wrapper">
+                            <svg class="progress-circle" viewBox="0 0 160 160">
+                                <circle class="progress-circle-bg" cx="80" cy="80" r="70"></circle>
+                                <circle id="progressCircle" class="progress-circle-fill" cx="80" cy="80" r="70"></circle>
+                            </svg>
+                            <div id="progressPercentage" class="progress-percentage">50%</div>
+                        </div>
+
+                        <div id="completionChecklist" class="completion-list">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="notificationToast" class="notification-toast"></div>
+
+    <script>
+        // Photo Upload
+        const photoUpload = document.getElementById('photoUpload');
+        const profileImage = document.getElementById('profileImage');
+
+        if (photoUpload) {
+    photoUpload.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+                    // Validate file size (max 5MB)
+                    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                    if (file.size > maxSize) {
+                        showNotification('Image file is too large. Please use an image smaller than 5MB.', 'error');
+                        return;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        showNotification('Please select a valid image file.', 'error');
+                        return;
+                    }
+                    
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                        const base64Data = e.target.result;
+                        
+                        // Update images immediately for better UX
+                        profileImage.src = base64Data;
+                
+                // Update header profile icon
+                const headerProfileIcon = document.getElementById('headerProfileIcon');
+                if (headerProfileIcon) {
+                            headerProfileIcon.src = base64Data;
+                }
+                
+                        try {
+                            // Save to database
+                const profileData = getProfileDataForDatabase();
+                            profileData.profileImage = base64Data;
+                            
+                            const result = await saveProfileDataToDatabase(profileData);
+                            
+                            if (result && result.success) {
+                                showNotification('Photo uploaded and saved successfully!', 'success');
+                                console.log('Profile image saved successfully');
+                            } else {
+                                showNotification('Photo uploaded but failed to save. Please try again.', 'error');
+                                console.error('Failed to save profile image:', result);
+                            }
+                        } catch (err) {
+                    console.error('Database save error:', err);
+                            showNotification('Failed to save photo. Please try again.', 'error');
+                        }
+                
+                updateProfileCompletion();
+            };
+                    
+                    reader.onerror = function() {
+                        showNotification('Failed to read image file. Please try again.', 'error');
+                        console.error('FileReader error');
+                    };
+                    
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+        // Personal Info Edit
+        const editPersonalInfoBtn = document.getElementById('editPersonalInfoBtn');
+        const editPersonalInfoIcon = document.getElementById('editPersonalInfoIcon');
+        const editPersonalInfoText = document.getElementById('editPersonalInfoText');
+        const savePersonalInfoBtn = document.getElementById('savePersonalInfoBtn');
+        const personalInfoActions = document.getElementById('personalInfoActions');
+        let originalPersonalInfo = {};
+        let isPersonalInfoEditing = false;
+
+        if (editPersonalInfoBtn) {
+            editPersonalInfoBtn.addEventListener('click', function() {
+                if (isPersonalInfoEditing) {
+                    // Cancel edit mode
+                    togglePersonalInfoEdit(false);
+                    restorePersonalInfo();
+                } else {
+                    // Enter edit mode
+                    togglePersonalInfoEdit(true);
+                }
+            });
+        }
+
+        if (savePersonalInfoBtn) {
+            savePersonalInfoBtn.addEventListener('click', function() {
+                savePersonalInfo();
+            });
+        }
+
+        function togglePersonalInfoEdit(editMode) {
+            isPersonalInfoEditing = editMode;
+            const displays = document.querySelectorAll('#personalInfoGrid .info-display');
+            const inputs = document.querySelectorAll('#personalInfoGrid .info-edit');
+
+            displays.forEach(display => {
+                display.style.display = editMode ? 'none' : 'block';
+            });
+
+            inputs.forEach(input => {
+                input.style.display = editMode ? 'block' : 'none';
+            });
+
+            if (personalInfoActions) {
+                personalInfoActions.classList.toggle('show', editMode);
+            }
+
+            // Toggle Edit/Cancel button - keep icon visible
+            if (editPersonalInfoBtn && editPersonalInfoIcon && editPersonalInfoText) {
+                if (editMode) {
+                    // Show Cancel - icon becomes X, text becomes Cancel
+                    editPersonalInfoIcon.src = "data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 20 20' fill='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'/%3E%3C/svg%3E";
+                    editPersonalInfoIcon.style.display = 'inline-block';
+                    editPersonalInfoText.textContent = 'Cancel';
+                } else {
+                    // Show Edit - icon is edit icon, text is Edit
+                    editPersonalInfoIcon.src = '../images/editicon.png';
+                    editPersonalInfoIcon.style.display = 'inline-block';
+                    editPersonalInfoText.textContent = 'Edit';
+                }
+            }
+
+            if (editMode) {
+                inputs.forEach(input => {
+                    const fieldId = input.id.replace('Input', '');
+                    originalPersonalInfo[fieldId] = input.value;
+                });
+            }
+        }
+
+        function restorePersonalInfo() {
+            const inputs = document.querySelectorAll('.info-edit');
+            inputs.forEach(input => {
+                const fieldId = input.id.replace('Input', '');
+                if (originalPersonalInfo[fieldId] !== undefined) {
+                    input.value = originalPersonalInfo[fieldId];
+                }
+            });
+        }
+
+        function savePersonalInfo() {
+            const inputs = document.querySelectorAll('.info-edit');
+            const displays = document.querySelectorAll('.info-display');
+            const profileName = document.getElementById('profileName');
+            const fullNameInput = document.getElementById('fullNameInput');
+            
+            inputs.forEach((input, index) => {
+                if (displays[index]) {
+                    if (input.type === 'date') {
+                        if (input.value) {
+                            const date = new Date(input.value + 'T00:00:00');
+                            displays[index].textContent = date.toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            });
+                        }
+                    } else if (input.tagName === 'SELECT') {
+                        displays[index].textContent = input.options[input.selectedIndex].text;
+                    } else {
+                        displays[index].textContent = input.value;
+                    }
+                }
+            });
+
+            if (fullNameInput && profileName) {
+                profileName.textContent = fullNameInput.value;
+            }
+
+            togglePersonalInfoEdit(false);
+            showNotification('Personal information saved successfully!', 'success');
+            updateProfileCompletion();
+            
+            const profileData = getProfileDataForDatabase();
+            saveProfileDataToDatabase(profileData).catch(err => {
+                console.error('Database save error:', err);
+            });
+        }
+
+        // Address Edit
+        const editAddressBtn = document.getElementById('editAddressBtn');
+        const editAddressIcon = document.getElementById('editAddressIcon');
+        const editAddressText = document.getElementById('editAddressText');
+        const saveAddressBtn = document.getElementById('saveAddressBtn');
+        const addressDisplay = document.getElementById('addressDisplay');
+        const addressInput = document.getElementById('addressInput');
+        let originalAddress = '';
+        let isAddressEditing = false;
+
+        if (editAddressBtn) {
+            editAddressBtn.addEventListener('click', function() {
+                if (isAddressEditing) {
+                    // Cancel edit mode
+                    toggleAddressEdit(false);
+                    if (addressInput) {
+                        addressInput.value = originalAddress || addressInput.value;
+                    }
+                } else {
+                    // Enter edit mode
+                    toggleAddressEdit(true);
+                }
+            });
+        }
+
+        if (saveAddressBtn) {
+            saveAddressBtn.addEventListener('click', async function() {
+                if (addressInput && addressDisplay) {
+                    addressDisplay.textContent = addressInput.value;
+                    originalAddress = addressInput.value;
+                    toggleAddressEdit(false);
+                    showNotification('Address saved successfully!', 'success');
+                    updateProfileCompletion();
+                    
+                    const profileData = getProfileDataForDatabase();
+                    await saveProfileDataToDatabase(profileData).catch(err => {
+                        console.error('Database save error:', err);
+                    });
+                }
+            });
+        }
+
+        function toggleAddressEdit(editMode) {
+            isAddressEditing = editMode;
+            
+            if (addressDisplay) {
+                addressDisplay.style.display = editMode ? 'none' : 'block';
+            }
+            if (addressInput) {
+                addressInput.style.display = editMode ? 'block' : 'none';
+                if (editMode) {
+                    originalAddress = addressInput.value;
+                    addressInput.focus();
+                }
+            }
+            
+            if (saveAddressBtn) {
+                saveAddressBtn.style.display = editMode ? 'block' : 'none';
+            }
+            
+            // Toggle Edit/Cancel button - keep icon visible
+            if (editAddressBtn && editAddressIcon && editAddressText) {
+                if (editMode) {
+                    // Show Cancel - icon becomes X, text becomes Cancel
+                    editAddressIcon.src = "data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 20 20' fill='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'/%3E%3C/svg%3E";
+                    editAddressIcon.style.display = 'inline-block';
+                    editAddressText.textContent = 'Cancel';
+                } else {
+                    // Show Edit - icon is edit icon, text is Edit
+                    editAddressIcon.src = '../images/editicon.png';
+                    editAddressIcon.style.display = 'inline-block';
+                    editAddressText.textContent = 'Edit';
+                }
+            }
+        }
+
+        // Initialize address in display mode
+        if (addressInput && addressDisplay && saveAddressBtn && editAddressBtn) {
+            addressInput.style.display = 'none';
+            addressDisplay.style.display = 'block';
+            saveAddressBtn.style.display = 'none';
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const toast = document.getElementById('notificationToast');
+            if (!toast) return;
+
+            toast.textContent = message;
+            toast.className = `notification-toast ${type}`;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Profile Completion
+        const completionTasks = [
+            { id: 'setup', label: 'Setup account', weight: 25, check: () => true },
+            { id: 'photo', label: 'Upload your photo', weight: 25, check: () => {
+                const profileImg = document.getElementById('profileImage');
+                if (!profileImg || !profileImg.src) return false;
+                
+                const currentSrc = profileImg.src;
+                
+                // Check if it's a base64 data URI (user uploaded image) - this is definitely uploaded
+                if (currentSrc.startsWith('data:image/')) {
+                    return true;
+                }
+                
+                // Normalize the src to handle different path formats
+                const normalizedSrc = currentSrc.toLowerCase().replace(/\\/g, '/');
+                
+                // Check if image is the default blank profile image
+                // Handle both relative paths and full URLs (e.g., http://localhost/Spendy/images/blankprofile.png)
+                const isDefaultImage = normalizedSrc.includes('blankprofile.png') || 
+                                      normalizedSrc.endsWith('images/blankprofile.png') ||
+                                      normalizedSrc.endsWith('../images/blankprofile.png') ||
+                                      normalizedSrc === 'images/blankprofile.png' ||
+                                      normalizedSrc === '../images/blankprofile.png' ||
+                                      normalizedSrc.includes('/blankprofile.png');
+                
+                // Photo is uploaded only if it's NOT the default image
+                // Return false if it's the default image, true otherwise
+                return !isDefaultImage;
+            }},
+            { id: 'personal', label: 'Personal Info', weight: 25, check: () => {
+                // Only check inputs within the personal info grid
+                const personalInfoGrid = document.getElementById('personalInfoGrid');
+                if (!personalInfoGrid) return false;
+                const inputs = personalInfoGrid.querySelectorAll('.info-edit');
+                let filledCount = 0;
+                inputs.forEach(input => {
+                    const value = input.value ? input.value.trim() : '';
+                    // For select elements, check if a valid option is selected (not empty)
+                    if (input.tagName === 'SELECT') {
+                        if (value && value !== '' && value !== 'Select...') {
+                            filledCount++;
+                        }
+                    } else {
+                        // For text/email/tel/date inputs
+                        if (value !== '') {
+                            filledCount++;
+                        }
+                    }
+                });
+                // Require at least 5 out of 6 fields to be filled
+                return filledCount >= 5;
+            }},
+            { id: 'location', label: 'Location', weight: 25, check: () => {
+                const addressInput = document.getElementById('addressInput');
+                if (!addressInput) return false;
+                const addressValue = addressInput.value ? addressInput.value.trim() : '';
+                return addressValue !== '';
+            }}
+        ];
+        
+        function calculateProfileCompletion() {
+            let totalWeight = 0;
+            let completedWeight = 0;
+            
+            completionTasks.forEach(task => {
+                totalWeight += task.weight;
+                if (task.check()) {
+                    completedWeight += task.weight;
+                }
+            });
+            
+            const percentage = totalWeight > 0 ? Math.round((completedWeight / totalWeight) * 100) : 0;
+            // Ensure percentage is between 0 and 100
+            const clampedPercentage = Math.max(0, Math.min(100, percentage));
+            return { percentage: clampedPercentage, completedWeight, totalWeight };
+        }
+        
+        function updateProgressCircle(percentage) {
+            const progressCircle = document.getElementById('progressCircle');
+            const progressPercentage = document.getElementById('progressPercentage');
+            
+            if (progressCircle) {
+                const circumference = 2 * Math.PI * 70;
+                const offset = circumference - (percentage / 100) * circumference;
+                progressCircle.style.strokeDashoffset = offset;
+            }
+            
+            if (progressPercentage) {
+                progressPercentage.textContent = percentage + '%';
+            }
+        }
+        
+        function renderCompletionChecklist() {
+            const checklist = document.getElementById('completionChecklist');
+            if (!checklist) return;
+            
+            const { percentage } = calculateProfileCompletion();
+            
+            checklist.innerHTML = completionTasks.map(task => {
+                const isComplete = task.check();
+                return `
+                    <div class="completion-item">
+                        <span style="display: flex; align-items: center;">
+                            <span class="check ${isComplete ? 'complete' : 'incomplete'}">${isComplete ? '✓' : '○'}</span>
+                            <span>${task.label}</span>
+                        </span>
+                        <span style="opacity: 0.7; font-size: 14px;">${task.weight}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateProfileCompletion() {
+            const { percentage } = calculateProfileCompletion();
+            updateProgressCircle(percentage);
+            renderCompletionChecklist();
+        }
+        
+        // Database Integration
+        function loadProfileDataFromDatabase(userData) {
+            if (!userData) return;
+            
+            // Handle profile image - use default if empty/null
+    const profileImage = document.getElementById('profileImage');
+    const headerProfileIcon = document.getElementById('headerProfileIcon');
+            const defaultImage = '../images/blankprofile.png';
+            
+            // Function to handle image load errors
+            const handleImageError = function(imgElement) {
+                return function() {
+                    console.warn('Failed to load profile image, using default');
+                    imgElement.src = defaultImage;
+                };
+            };
+            
+            if (userData.profileImage && 
+                userData.profileImage.trim() !== '' && 
+                userData.profileImage !== 'null' &&
+                userData.profileImage.length > 0) {
+                // User has uploaded a profile image (base64 data URI or file path)
+                try {
+                    if (profileImage) {
+                        profileImage.src = userData.profileImage;
+                        profileImage.onerror = handleImageError(profileImage);
+                    }
+                    if (headerProfileIcon) {
+                        headerProfileIcon.src = userData.profileImage;
+                        headerProfileIcon.onerror = handleImageError(headerProfileIcon);
+                    }
+                } catch (imgError) {
+                    console.error('Error setting profile image:', imgError);
+                    if (profileImage) profileImage.src = defaultImage;
+                    if (headerProfileIcon) headerProfileIcon.src = defaultImage;
+                }
+            } else {
+                // No profile image, use default
+                if (profileImage) profileImage.src = defaultImage;
+                if (headerProfileIcon) headerProfileIcon.src = defaultImage;
+}
+            
+            let fullName = '';
+            if (userData.fullName) {
+                fullName = userData.fullName;
+            } else if (userData.firstName || userData.lastName) {
+                fullName = ((userData.firstName || '') + ' ' + (userData.lastName || '')).trim();
+            }
+            
+            if (fullName) {
+                const profileName = document.getElementById('profileName');
+                const fullNameDisplay = document.getElementById('fullNameDisplay');
+                const fullNameInput = document.getElementById('fullNameInput');
+                
+                if (profileName) profileName.textContent = fullName;
+                if (fullNameDisplay) fullNameDisplay.textContent = fullName;
+                if (fullNameInput) fullNameInput.value = fullName;
+            }
+            
+            if (userData.email) {
+                const emailDisplay = document.getElementById('emailDisplay');
+                const emailInput = document.getElementById('emailInput');
+                
+                if (emailDisplay) emailDisplay.textContent = userData.email;
+                if (emailInput) emailInput.value = userData.email;
+            }
+            
+            if (userData.phone) {
+                const phoneDisplay = document.getElementById('phoneDisplay');
+                const phoneInput = document.getElementById('phoneInput');
+                
+                if (phoneDisplay) phoneDisplay.textContent = userData.phone;
+                if (phoneInput) phoneInput.value = userData.phone;
+            }
+            
+            if (userData.birthday) {
+                const birthdayDisplay = document.getElementById('birthdayDisplay');
+                const birthdayInput = document.getElementById('birthdayInput');
+                
+                if (birthdayInput) {
+                    birthdayInput.value = userData.birthday;
+                    
+                    if (birthdayDisplay && userData.birthday) {
+                        const date = new Date(userData.birthday + 'T00:00:00');
+                        birthdayDisplay.textContent = date.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                    }
+                }
+            }
+            
+            if (userData.gender) {
+                const genderDisplay = document.getElementById('genderDisplay');
+                const genderInput = document.getElementById('genderInput');
+                
+                if (genderDisplay) genderDisplay.textContent = userData.gender;
+                if (genderInput) {
+                    genderInput.value = userData.gender;
+                    Array.from(genderInput.options).forEach(option => {
+                        option.selected = option.value === userData.gender;
+                    });
+                }
+            }
+            
+            if (userData.nationality) {
+                const nationalityDisplay = document.getElementById('nationalityDisplay');
+                const nationalityInput = document.getElementById('nationalityInput');
+                
+                if (nationalityDisplay) nationalityDisplay.textContent = userData.nationality;
+                if (nationalityInput && nationalityInput.tagName === 'SELECT') {
+                    nationalityInput.value = userData.nationality;
+                    // Also ensure the option is properly selected
+                    Array.from(nationalityInput.options).forEach(option => {
+                        option.selected = option.value === userData.nationality;
+                    });
+                } else if (nationalityInput) {
+                    nationalityInput.value = userData.nationality;
+                }
+            }
+            
+            if (userData.address) {
+                const addressDisplay = document.getElementById('addressDisplay');
+                const addressInput = document.getElementById('addressInput');
+                
+                if (addressDisplay) addressDisplay.textContent = userData.address;
+                if (addressInput) addressInput.value = userData.address;
+            }
+            
+            setTimeout(updateProfileCompletion, 100);
+        }
+        
+        function getProfileDataForDatabase() {
+            const fullNameInput = document.getElementById('fullNameInput');
+            const emailInput = document.getElementById('emailInput');
+            const phoneInput = document.getElementById('phoneInput');
+            const birthdayInput = document.getElementById('birthdayInput');
+            const genderInput = document.getElementById('genderInput');
+            const nationalityInput = document.getElementById('nationalityInput');
+            const addressInput = document.getElementById('addressInput');
+            const profileImage = document.getElementById('profileImage');
+            
+            const fullName = fullNameInput ? fullNameInput.value.trim() : '';
+            const nameParts = fullName.split(' ', 2);
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts[1] || '';
+            
+            return {
+                fullName: fullName,
+                firstName: firstName,
+                lastName: lastName,
+                email: emailInput ? emailInput.value : '',
+                phone: phoneInput ? phoneInput.value : '',
+                birthday: birthdayInput ? birthdayInput.value : '',
+                gender: genderInput ? genderInput.value : '',
+                nationality: nationalityInput ? nationalityInput.value : '',
+                address: addressInput ? addressInput.value : '',
+                profileImage: profileImage ? profileImage.src : ''
+            };
+        }
+        
+        async function saveProfileDataToDatabase(profileData = null) {
+            const dataToSave = profileData || getProfileDataForDatabase();
+            
+            try {
+                console.log('Saving profile data:', {
+                    hasAddress: !!dataToSave.address,
+                    hasProfileImage: !!dataToSave.profileImage,
+                    addressValue: dataToSave.address
+                });
+                
+                const response = await fetch('../api/update_profile.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dataToSave)
+                });
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    throw new Error('Server returned invalid response. Check console for details.');
+                }
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(errorData.error || 'Failed to save profile data');
+                }
+                
+                const result = await response.json();
+                console.log('Profile save response:', result);
+                
+                if (result.success) {
+                    // If profile image was saved, update it from the response
+                    if (result.user && result.user.profileImage) {
+                        const profileImage = document.getElementById('profileImage');
+                        const headerProfileIcon = document.getElementById('headerProfileIcon');
+                        if (profileImage) profileImage.src = result.user.profileImage;
+                        if (headerProfileIcon) headerProfileIcon.src = result.user.profileImage;
+                    }
+                return result;
+                } else {
+                    throw new Error(result.error || 'Failed to save profile');
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                throw error;
+            }
+        }
+        
+        async function loadProfileDataOnPageLoad() {
+            try {
+                const response = await fetch('../api/get_profile.php', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load profile data');
+                }
+                
+                const userData = await response.json();
+                
+                if (userData.error) {
+                    console.error('API returned error:', userData.error);
+                    return;
+                }
+                
+                console.log('Profile data loaded:', {
+                    userId: userData.userId,
+                    fullName: userData.fullName,
+                    hasProfileImage: !!(userData.profileImage && userData.profileImage.trim() !== ''),
+                    profileImageLength: userData.profileImage ? userData.profileImage.length : 0
+                });
+                
+                loadProfileDataFromDatabase(userData);
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                // On error, ensure default images are shown
+                const profileImage = document.getElementById('profileImage');
+                const headerProfileIcon = document.getElementById('headerProfileIcon');
+                const defaultImage = '../images/blankprofile.png';
+                if (profileImage) profileImage.src = defaultImage;
+                if (headerProfileIcon) headerProfileIcon.src = defaultImage;
+            }
+        }
+        
+        // Initialize - wait for DOM and images to load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                // Wait a bit for images to load
+                setTimeout(function() {
+                    updateProfileCompletion();
+                    loadProfileDataOnPageLoad();
+                }, 200);
+            });
+        } else {
+            // DOM already loaded
+            setTimeout(function() {
+                updateProfileCompletion();
+                loadProfileDataOnPageLoad();
+            }, 200);
+        }
+
+        // Notification System
+        let isNotificationsOpen = false;
+        let notificationsData = [];
+
+        async function loadNotifications() {
+            const notificationList = document.getElementById('notificationList');
+            const notificationBadge = document.getElementById('notificationBadge');
+            
+            if (!notificationList) return;
+            
+            try {
+                const response = await fetch('../api/get_notifications.php?limit=10');
+                const data = await response.json();
+                
+                if (data.success) {
+                    notificationsData = data.notifications || [];
+                    renderNotifications(notificationsData);
+                    
+                    // Update badge
+                    if (notificationBadge) {
+                        const count = data.count || 0;
+                        if (count > 0) {
+                            notificationBadge.textContent = count > 99 ? '99+' : count;
+                            notificationBadge.classList.add('show');
+                        } else {
+                            notificationBadge.classList.remove('show');
+                        }
+                    }
+                } else {
+                    notificationList.innerHTML = '<div class="notification-empty">Failed to load notifications</div>';
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                notificationList.innerHTML = '<div class="notification-empty">Failed to load notifications</div>';
+            }
+        }
+
+        function renderNotifications(notifications) {
+            const notificationList = document.getElementById('notificationList');
+            if (!notificationList) return;
+            
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '<div class="notification-empty">No notifications yet</div>';
+                return;
+            }
+            
+            notificationList.innerHTML = notifications.map(notif => `
+                <div class="notification-item">
+                    <div class="notification-icon-large">${notif.icon || '🔔'}</div>
+                    <div class="notification-content">
+                        <div class="notification-message">${escapeHtml(notif.message)}</div>
+                        <div class="notification-time">${notif.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            if (!dropdown) return;
+            
+            isNotificationsOpen = !isNotificationsOpen;
+            
+            if (isNotificationsOpen) {
+                dropdown.classList.add('show');
+                loadNotifications();
+            } else {
+                dropdown.classList.remove('show');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notificationDropdown');
+            const wrapper = document.querySelector('.notification-wrapper');
+            
+            if (dropdown && wrapper && !wrapper.contains(event.target)) {
+                dropdown.classList.remove('show');
+                isNotificationsOpen = false;
+            }
+        });
+
+        // Load notifications on page load
+        loadNotifications();
+        
+        // Refresh notifications every 30 seconds
+        setInterval(loadNotifications, 30000);
+
+// Logout function
+function handleLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        fetch('logout.php', { method: 'POST' })
+            .then(() => {
+                if (typeof smoothPageTransition === 'function') {
+                    smoothPageTransition('login.html');
+                } else {
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(() => {
+                if (typeof smoothPageTransition === 'function') {
+                    smoothPageTransition('login.html');
+                } else {
+                    window.location.href = 'login.html';
+                }
+            });
+    }
+}
+    </script>
+    <script src="../js/smooth-transitions.js"></script>
+</body>
+</html>
+
