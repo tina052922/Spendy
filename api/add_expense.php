@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
+
 // Start session for user_id
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
