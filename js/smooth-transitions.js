@@ -81,10 +81,22 @@
         document.querySelectorAll('[onclick*="window.location.href"]').forEach(element => {
             const originalOnclick = element.getAttribute('onclick');
             if (originalOnclick) {
+                // Skip transitions for expenses/income toggle buttons
+                const isToggleBtn = element.classList.contains('toggle-btn');
+                const match = originalOnclick.match(/window\.location\.href\s*=\s*['"]([^'"]+)['"]/);
+                const isDashboardNav = match && match[1] && (
+                    match[1].includes('DashboardExpenses.html') || 
+                    match[1].includes('DashboardIncome.html')
+                );
+                
+                if (isToggleBtn && isDashboardNav) {
+                    // Don't add transition for expenses/income toggle buttons
+                    return;
+                }
+                
                 element.removeAttribute('onclick');
                 element.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const match = originalOnclick.match(/window\.location\.href\s*=\s*['"]([^'"]+)['"]/);
                     if (match && match[1]) {
                         window.smoothPageTransition(match[1]);
                     }
