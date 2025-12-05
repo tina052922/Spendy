@@ -120,6 +120,7 @@ const NotificationSystem = {
     },
 
     /**
+     * 
      * Render notifications in the dropdown
      */
     renderNotifications(notifications) {
