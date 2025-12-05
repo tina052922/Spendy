@@ -1179,8 +1179,8 @@
             <div class="auto-save-overlay" id="autoSaveOverlay">
                 <div class="auto-save-popup">
                     <div class="auto-save-header">
-                        <h3>Auto-Save Opportunity</h3>
-                        <p>Save 5% of your income to a savings plan</p>
+                        <h3>Auto-Save Required</h3>
+                        <p>For income of ₱20,000 or more, you must allocate 5% to a savings plan before continuing.</p>
                     </div>
                     <div class="auto-save-amount">
                         <div class="label">Amount to Save</div>
@@ -1220,7 +1220,6 @@
                         </div>
                     </div>
                     <div class="auto-save-actions">
-                        <button class="auto-save-btn auto-save-btn-secondary" onclick="closeAutoSavePopup()">Cancel</button>
                         <button class="auto-save-btn auto-save-btn-primary" id="confirmAutoSaveBtn" onclick="confirmAutoSave()" disabled>Save to Plan</button>
                     </div>
                 </div>
@@ -1532,14 +1531,17 @@
             });
         });
 
+        // Store pending income data for submission after plan selection
+        let pendingIncomeData = null;
+
         // Save income
         document.getElementById('save-income-btn').addEventListener('click', async () => {
-            const amount = document.getElementById('income-amount').value;
+            const amount = parseFloat(document.getElementById('income-amount').value);
             const note = document.getElementById('income-note').value;
             const category = document.getElementById('selected-category').value;
             const date = document.getElementById('selected-date').value || formatDate(new Date());
 
-            if (!amount || parseFloat(amount) <= 0) {
+            if (!amount || amount <= 0) {
                 alert('Please enter a valid amount');
                 return;
             }
@@ -1549,6 +1551,24 @@
                 return;
             }
 
+            // If amount >= 20000, show modal first and store income data
+            if (amount >= 20000) {
+                const autoSaveAmount = amount * 0.05; // 5% of income
+                
+                // Store income data for later submission
+                pendingIncomeData = {
+                    amount: amount,
+                    category: category,
+                    note: note,
+                    date: date
+                };
+                
+                // Show the modal - it won't close until plan is selected
+                showAutoSavePopup(autoSaveAmount);
+                return; // Don't submit income yet
+            }
+
+            // For amounts < 20000, submit normally
             try {
                 const formData = new FormData();
                 formData.append('amount', amount);
@@ -1573,33 +1593,7 @@
                     // Reload
                     loadIncome();
                     loadStats();
-                    
-                    // Check if auto-save should be triggered
-                    console.log('Income response:', data); // Debug log
-                    console.log('Auto-save data:', data.auto_save); // Debug log
-                    console.log('Amount from form:', parseFloat(amount)); // Debug log
-                    
-                    // Check auto-save with more flexible conditions
-                    const shouldTrigger = data.auto_save && 
-                                         (data.auto_save.trigger === true || data.auto_save.trigger === 'true' || data.auto_save.trigger === 1) &&
-                                         data.auto_save.amount > 0;
-                    
-                    if (shouldTrigger) {
-                        console.log('✅ Triggering auto-save popup with amount:', data.auto_save.amount);
-                        setTimeout(() => {
-                            showAutoSavePopup(parseFloat(data.auto_save.amount));
-                        }, 500); // Small delay to ensure UI is ready
-                    } else {
-                        console.log('❌ Auto-save not triggered. Reason:', {
-                            has_auto_save: !!data.auto_save,
-                            trigger: data.auto_save?.trigger,
-                            trigger_type: typeof data.auto_save?.trigger,
-                            amount: data.auto_save?.amount,
-                            amount_type: typeof data.auto_save?.amount,
-                            form_amount: parseFloat(amount)
-                        });
-                        alert('Income added successfully!');
-                    }
+                    alert('Income added successfully!');
                 } else {
                     alert('Error: ' + (data.message || 'Failed to save income'));
                 }
@@ -1877,8 +1871,12 @@
         }
 
         function closeAutoSavePopup() {
-            // Only allow closing from the plan selection step (step 2), not from plan type selection (step 1)
-            // This ensures users must make a choice
+            // Prevent closing if there's pending income data (amount >= 20000)
+            // User must select a plan before closing
+            if (pendingIncomeData !== null) {
+                return; // Don't allow closing
+            }
+            
             document.getElementById('autoSaveOverlay').classList.remove('show');
             document.getElementById('autoSavePlanListOverlay').classList.remove('show');
             document.getElementById('autoSavePlanListOverlay').style.display = 'none';
@@ -2001,10 +1999,43 @@
             confirmBtn.textContent = 'Saving...';
 
             try {
+                // First, if there's pending income data, submit the income
+                if (pendingIncomeData !== null) {
+                    const incomeFormData = new FormData();
+                    incomeFormData.append('amount', pendingIncomeData.amount);
+                    incomeFormData.append('category', pendingIncomeData.category);
+                    incomeFormData.append('note', pendingIncomeData.note);
+                    incomeFormData.append('date', pendingIncomeData.date);
+
+                    const incomeResponse = await fetch('../api/add_income.php', {
+                        method: 'POST',
+                        body: incomeFormData
+                    });
+
+                    const incomeData = await incomeResponse.json();
+                    
+                    if (!incomeData.success) {
+                        alert('Error saving income: ' + (incomeData.message || 'Failed to save income'));
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = selectedPlanType === 'ended' ? 'Reactivate & Save' : 'Save to Plan';
+                        return;
+                    }
+                    
+                    // Clear form after successful income submission
+                    document.getElementById('income-amount').value = '';
+                    document.getElementById('income-note').value = '';
+                    document.getElementById('selected-category').value = '';
+                    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+                    
+                    // Reload income list
+                    loadIncome();
+                }
+
+                // Now save to the selected plan
                 const formData = new FormData();
                 formData.append('savings_id', selectedSavingsPlanId);
                 formData.append('amount', currentAutoSaveAmount);
-                formData.append('fund_source', 'Auto-Save from Income');
+                formData.append('fund_source', 'Remaining Budget'); // Track as Remaining Budget to decrease budget remaining
                 formData.append('reactivate_plan', selectedPlanType === 'ended' ? 'true' : 'false');
 
                 const response = await fetch('../api/auto_save_income.php', {
@@ -2015,12 +2046,19 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    let message = 'Auto-save successful! ₱' + currentAutoSaveAmount.toFixed(2) + ' has been added to your savings plan.';
+                    let message = 'Income saved successfully!\n\n';
+                    message += 'Auto-save successful! ₱' + currentAutoSaveAmount.toFixed(2) + ' (5% of income) has been allocated to your savings plan.';
                     if (selectedPlanType === 'ended' && (data.reactivated || data.plan_reactivated)) {
                         message += '\n\nThe plan has been reactivated and is now active. You may want to update its end date in the savings page.';
                     }
                     alert(message);
+                    
+                    // Clear pending income data
+                    pendingIncomeData = null;
+                    
+                    // Close popup (now allowed since plan is selected)
                     closeAutoSavePopup();
+                    
                     // Reload stats to reflect the change
                     loadStats();
                 } else {
@@ -2036,16 +2074,25 @@
             }
         }
 
-        // Close popup when clicking overlay
+        // Prevent closing popup when clicking overlay (if there's pending income)
         document.addEventListener('DOMContentLoaded', () => {
             const overlay = document.getElementById('autoSaveOverlay');
             if (overlay) {
                 overlay.addEventListener('click', function(e) {
-                    if (e.target === this) {
+                    // Don't close if there's pending income data
+                    if (e.target === this && pendingIncomeData === null) {
                         closeAutoSavePopup();
                     }
                 });
             }
+            
+            // Prevent ESC key from closing if there's pending income
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && pendingIncomeData !== null) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
         });
     </script>
     <script src="../js/notification-system.js"></script>

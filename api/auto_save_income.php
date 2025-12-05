@@ -108,6 +108,22 @@ try {
     }
     mysqli_stmt_close($stmt);
 
+    // If fund_source is "Remaining Budget", track it for budget calculation
+    // This ensures the budget remaining decreases by the allocated amount
+    if ($fund_source === 'Remaining Budget') {
+        $activity_id = 'ACT' . time() . rand(1000, 9999);
+        // Store amount at the start in a parseable format for reliable extraction
+        $amount_str = sprintf('%.2f', $amount);
+        $action_description = "AMOUNT:" . $amount_str . "|Saved ₱" . number_format($amount, 2) . " from Remaining Budget to savings plan " . $savings_id . " (Transaction: " . $transaction_id . ")";
+        
+        $query = "INSERT INTO activity_log (activity_id, user_id, related_table, related_record_id, action_type, action_description) 
+                  VALUES (?, ?, 'savings', ?, 'remaining_budget_savings', ?)";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "ssss", $activity_id, $user_id, $savings_id, $action_description);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+
     // Commit transaction
     mysqli_commit($conn);
     
