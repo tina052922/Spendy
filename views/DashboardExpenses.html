@@ -912,10 +912,10 @@
                 <img src="../images/archsavingshover.png" alt="Active" class="hover-arch">
                 <img src="../images/dashboardiconblue.png" alt="Dashboard" class="active-icon">
             </div>
-            <div class="nav-icon" onclick="if(typeof smoothPageTransition==='function'){smoothPageTransition('savings.html');}else{window.location.href='savings.html';}" style="cursor: pointer;">
+            <div class="nav-icon" onclick="window.location.href='savings.html';" style="cursor: pointer;">
                 <img src="../images/dashboardsavingsicon.png" alt="Savings">
             </div>
-            <div class="nav-icon" onclick="if(typeof smoothPageTransition==='function'){smoothPageTransition('settings.html');}else{window.location.href='settings.html';}" style="cursor: pointer;">
+            <div class="nav-icon" onclick="window.location.href='settings.html';" style="cursor: pointer;">
                 <img src="../images/Windows 10 Settings - iconSvg.co.png" alt="Settings">
             </div>
             <div class="nav-icon" style="margin-top:auto; cursor: pointer;" onclick="handleLogout()">
@@ -942,7 +942,7 @@
                             </div>
                         </div>
                     </div>
-                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon" onclick="if(typeof smoothPageTransition==='function'){smoothPageTransition('profile.html');}else{window.location.href='profile.html';}" style="cursor: pointer;" onerror="this.src='../images/blankprofile.png'">
+                    <img src="../images/blankprofile.png" alt="Profile" id="headerProfileIcon" onclick="window.location.href='profile.html';" style="cursor: pointer;" onerror="this.src='../images/blankprofile.png'">
                 </div>
             </header>
 
@@ -1468,6 +1468,5 @@
         });
     </script>
     <script src="../js/notification-system.js"></script>
-    <script src="../js/smooth-transitions.js"></script>
 </body>
 </html>
