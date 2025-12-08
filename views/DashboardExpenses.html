@@ -46,7 +46,6 @@
             min-height: 100vh;
         }
 
-        /* Sidebar - Exact copy from savings.html */
         .sidebar {
             width: 100px;
             background: var(--navy);
@@ -1459,14 +1458,13 @@
             }
         }
 
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             initCalendar();
             updateDateDisplay();
             updateMonthButton();
             loadExpenses();
             loadStats();
-            loadHeaderProfileImage(); // Load profile image on page load
+            loadHeaderProfileImage(); 
         });
     </script>
     <script src="../js/notification-system.js"></script>
