@@ -283,7 +283,8 @@ select:focus {
 }
 .secondary-btn:hover {
   border-color:#c2cde4;
-  box-shadow:0 10px 25px rgba(15,34,67,0.08);
+  transform:translateY(-2px);
+  box-shadow:0 14px 32px rgba(9,34,88,0.24);
 }
 
 /* Divider */
@@ -734,12 +735,23 @@ select:focus {
   const form = document.getElementById('signup-form');
   const messageDiv = document.getElementById('form-message');
   const submitBtn = document.getElementById('submit-btn');
+  const termsCheckbox = document.querySelector('input[name="terms"]');
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // Hide previous messages
     messageDiv.style.display = 'none';
+
+    // Ensure terms are accepted before proceeding
+    if (termsCheckbox && !termsCheckbox.checked) {
+      messageDiv.style.display = 'block';
+      messageDiv.style.backgroundColor = '#f8d7da';
+      messageDiv.style.color = '#721c24';
+      messageDiv.style.border = '1px solid #f5c6cb';
+      messageDiv.textContent = 'Please agree to the Terms & Condition to continue.';
+      return;
+    }
     
     // Disable submit button
     submitBtn.disabled = true;
